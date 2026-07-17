@@ -1,7 +1,8 @@
 # GitHub Pages project site URL
 baseURL = "https://tkhoaaa.github.io/fcj-workshop-votienkhoa/"
+# Rewrite absolute paths like /images/... to include the project base path
 relativeURLs = false
-canonifyURLs = false
+canonifyURLs = true
 defaultContentLanguage = "en"
 disableLanguages = []
 buildFuture = true
