@@ -1,59 +1,95 @@
 ---
 title: "Worklog Tuần 11"
-date: 2024-01-01
-weight: 2
+date: 2026-06-29
+weight: 11
 chapter: false
 pre: " <b> 1.11. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
-
 ### Mục tiêu tuần 11:
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+* Chuyển phần trải nghiệm kỹ thuật trong lab thành nội dung báo cáo và trình bày dễ hiểu.
+* Thu thập feedback từ mentor, teammate hoặc bạn học để cải thiện chất lượng diễn giải.
+* Hoàn thiện bản nháp cho các phần chính của internship report.
 
 ### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
 
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | Tạo outline cho một buổi chia sẻ ngắn về private S3 access và VPC Endpoints. | 29/06/2026 | 29/06/2026 | Ghi chú workshop |
+| **2** | Tóm tắt kiến trúc workshop theo cách dễ hiểu hơn cho người chưa có nhiều nền tảng. | 30/06/2026 | 30/06/2026 | Ghi chú sơ đồ cá nhân |
+| **3** | Viết nháp phần Worklog và Workshop trong internship report. | 01/07/2026 | 01/07/2026 | Outline báo cáo internship |
+| **4** | Chỉnh sửa nội dung dựa trên feedback từ quá trình tự review hoặc trao đổi với mentor, bạn học. | 02/07/2026 | 02/07/2026 | Feedback từ mentor/peer |
+| **5** | Bổ sung các phần hỗ trợ như blogs posted, events participated và các kỹ năng đã phát triển trong internship. | 03/07/2026 | 03/07/2026 | Hồ sơ hoạt động cá nhân |
+| **6** | Hoàn thiện bản nháp báo cáo với cấu trúc, thuật ngữ và mạch kỹ thuật rõ ràng hơn. | 04/07/2026 | 04/07/2026 | Ghi chú bản nháp cuối |
+
+### Cách thực hiện chi tiết:
+
+#### 1. Chuyển kiến trúc kỹ thuật thành kiến thức có thể giải thích được
+
+Tới giai đoạn này, phần lớn công việc đã thiên về triển khai. Sang tuần này, tôi chuyển trọng tâm sang diễn giải kiến trúc sao cho rõ ràng. Tôi chuẩn bị outline mô tả:
+
+* bài toán đang giải quyết
+* các dịch vụ được dùng
+* cách các dịch vụ kết nối với nhau
+* lý do chọn thiết kế đó
+
+Điều này đặc biệt hữu ích cho chủ đề workshop vì private S3 access phụ thuộc vào nhiều lớp AWS hoạt động đồng thời.
+
+#### 2. Biến phần thực hành thành một learning narrative có mạch
+
+Tôi sắp xếp lại nội dung để báo cáo không chỉ là danh sách công việc rời rạc. Thay vào đó, tôi mô tả tiến trình:
+
+* nền tảng AWS
+* networking
+* compute và storage
+* security và monitoring
+* private và hybrid S3 access
+* policy control và documentation
+
+Nhờ vậy báo cáo dễ theo dõi hơn và phản ánh đúng hành trình internship.
+
+#### 3. Dùng diagrams và evidence để hỗ trợ phần giải thích
+
+Tôi ghép:
+
+* architecture diagrams
+* screenshots
+* CLI outputs
+* ghi chú troubleshooting
+
+vào đúng phần nội dung báo cáo. Điều này giúp phần diễn giải không bị lý thuyết suông mà luôn có evidence đi kèm.
+
+#### 4. Cải thiện chất lượng bằng feedback
+
+Tôi tự review và đặt mình vào vị trí mentor hoặc người đọc để xem họ sẽ hiểu nội dung ra sao. Trọng tâm là đơn giản hóa những chủ đề phức tạp như:
+
+* endpoint types
+* DNS-based private access
+* layered policy evaluation
+
+nhưng vẫn giữ độ chính xác kỹ thuật.
+
+### Kết nối các dịch vụ AWS trong tuần này:
+
+* **Workshop Architecture + Documentation:** Các quan hệ kỹ thuật giữa dịch vụ được chuyển thành nội dung báo cáo có thể đọc hiểu.
+* **Diagrams + AWS Services:** Hình ảnh minh họa được đồng bộ với cấu hình thực tế.
+* **Evidence + Narrative:** CLI outputs và screenshots được dùng để chứng minh cho phần giải thích kỹ thuật.
+* **Mentor/Peer Feedback + Draft Content:** Feedback giúp cải thiện cách trình bày các tích hợp AWS service.
 
 ### Kết quả đạt được tuần 11:
 
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Tạo được bản nháp internship report có cấu trúc tốt hơn và dễ đọc hơn.
+* Cải thiện khả năng giải thích các tích hợp AWS phức tạp theo hướng tuần tự, có mạch.
+* Chuyển phần hands-on technical work thành material cho báo cáo và chia sẻ.
+* Nhận ra và sửa được nhiều chỗ diễn giải còn thiếu hoặc chưa rõ.
+* Tự tin hơn trong việc trình bày cloud architecture từ cả góc độ kỹ thuật lẫn giao tiếp.
 
-* Đã tạo và cấu hình AWS Free Tier account thành công.
+### Khó khăn gặp phải:
 
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
+* Việc đơn giản hóa kiến trúc mà không làm mất ý nghĩa kỹ thuật là khá khó.
+* Sắp xếp nhiều tuần công việc thành một narrative liền mạch đòi hỏi tổ chức nội dung cẩn thận.
 
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
+### Bài học rút ra và định hướng tiếp theo:
 
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+* Khi có thể giải thích rõ cho người khác, tôi cũng hiểu sâu hơn chính phần kỹ thuật mình đã làm.
+* Ở tuần cuối, tôi sẽ hoàn tất việc rà soát, chốt báo cáo, phản tư lại kết quả học tập và chuẩn bị phần tổng kết cuối cùng.

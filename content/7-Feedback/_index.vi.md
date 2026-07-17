@@ -1,44 +1,61 @@
 ---
 title: "Chia sẻ, đóng góp ý kiến"
-date: 2024-01-01
+date: 2026-07-20
 weight: 7
 chapter: false
 pre: " <b> 7. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
->Tại đây bạn có thể tự do đóng góp ý kiến cá nhân về những trải nghiệm khi tham gia chương trình First Cloud AI Journey, giúp team FCAJ cải thiện những vấn đề còn thiếu sót dựa trên các hạng mục sau:
+Phần này là những chia sẻ và góp ý cá nhân của tôi về trải nghiệm tham gia chương trình **First Cloud AI Journey**. Nhìn chung, tôi đánh giá đây là một chương trình rất giá trị vì kết hợp được giữa thực hành kỹ thuật, học hỏi từ cộng đồng và quá trình tự phát triển bản thân theo một lộ trình khá rõ ràng.
 
 ### Đánh giá chung
 
-**1. Môi trường làm việc**  
-Môi trường làm việc rất thân thiện và cởi mở. Các thành viên trong FCAJ luôn sẵn sàng hỗ trợ khi mình gặp khó khăn, kể cả ngoài giờ làm việc. Không gian làm việc gọn gàng, thoải mái, giúp mình tập trung tốt hơn. Tuy nhiên, mình nghĩ có thể bổ sung thêm một số buổi giao lưu hoặc team bonding để mọi người hiểu nhau hơn.
+**1. Môi trường học tập và làm việc**
+Môi trường học tập rất tích cực, hỗ trợ và tạo động lực. Chương trình không chỉ yêu cầu hoàn thành task mà còn khuyến khích người học hiểu lý do vì sao từng chủ đề lại quan trọng. Việc có một lộ trình đi từ nền tảng đến các chủ đề nâng cao như private connectivity và kiến trúc hệ thống giúp tôi giữ được sự tập trung tốt hơn.
 
-**2. Sự hỗ trợ của mentor / team admin**  
-Mentor hướng dẫn rất chi tiết, giải thích rõ ràng khi mình chưa hiểu và luôn khuyến khích mình đặt câu hỏi. Team admin hỗ trợ các thủ tục, tài liệu và tạo điều kiện để mình làm việc thuận lợi. Mình đánh giá cao việc mentor cho phép mình thử và tự xử lý vấn đề thay vì chỉ đưa đáp án.
+**2. Sự hỗ trợ từ mentor / program team**
+Sự hỗ trợ từ mentor và team chương trình rất có ý nghĩa. Khi cần, tôi luôn có định hướng để tiếp tục, nhưng đồng thời vẫn có đủ không gian để tự tìm hiểu và tự giải quyết vấn đề. Sự cân bằng này rất tốt vì nó giúp tôi phát triển cả kỹ thuật lẫn tính tự lập.
 
-**3. Sự phù hợp giữa công việc và chuyên ngành học**  
-Công việc mình được giao phù hợp với kiến thức mình đã học ở trường, đồng thời mở rộng thêm những mảng mới mà mình chưa từng được tiếp cận. Nhờ vậy, mình vừa củng cố kiến thức nền tảng, vừa học thêm kỹ năng thực tế.
+**3. Mức độ phù hợp với chuyên ngành học**
+Chương trình rất phù hợp với nền tảng Công nghệ thông tin của tôi, đặc biệt ở các mảng cloud computing, networking và system thinking. Đồng thời, chương trình cũng mở rộng cho tôi nhiều chủ đề mà trước đây tôi chưa có cơ hội thực hành sâu như observability, architecture documentation và các workshop liên quan đến AI.
 
-**4. Cơ hội học hỏi & phát triển kỹ năng**  
-Trong quá trình thực tập, mình học được nhiều kỹ năng mới như sử dụng công cụ quản lý dự án, kỹ năng làm việc nhóm, và cả cách giao tiếp chuyên nghiệp trong môi trường công ty. Mentor cũng chia sẻ nhiều kinh nghiệm thực tế giúp mình định hướng tốt hơn cho sự nghiệp.
+**4. Cơ hội học hỏi và phát triển kỹ năng**
+Chương trình tạo ra nhiều cơ hội phát triển trên nhiều khía cạnh:
 
-**5. Văn hóa & tinh thần đồng đội**  
-Văn hóa công ty rất tích cực: mọi người tôn trọng lẫn nhau, làm việc nghiêm túc nhưng vẫn vui vẻ. Khi có dự án gấp, mọi người cùng nhau cố gắng, hỗ trợ không phân biệt vị trí. Điều này giúp mình cảm thấy mình là một phần của tập thể, dù chỉ là thực tập sinh.
+* kỹ năng kỹ thuật về AWS
+* documentation và reporting
+* tham gia workshop kỹ thuật
+* tư duy kiến trúc hệ thống
+* kỷ luật tự học
 
-**6. Chính sách / phúc lợi cho thực tập sinh**  
-Công ty có hỗ trợ phụ cấp thực tập và tạo điều kiện về thời gian linh hoạt khi cần thiết. Ngoài ra, việc được tham gia các buổi đào tạo nội bộ là một điểm cộng lớn.
+Nhờ vậy, kỳ internship này mang lại cảm giác toàn diện hơn nhiều so với kiểu chỉ làm task đơn lẻ.
 
+**5. Cộng đồng và tinh thần đồng hành**
+Một trong những điểm tích cực nhất là không khí cộng đồng của FCAJ. Các workshop, technical sharing và việc học hỏi từ người khác giúp trải nghiệm trở nên sinh động hơn và bớt cảm giác học một mình. Tôi cảm nhận được rằng môi trường này khuyến khích sự tò mò và tinh thần cải thiện liên tục.
 
-### Một số câu hỏi khác
-- Điều bạn **hài lòng nhất** trong thời gian thực tập?  
-- Điều bạn nghĩ công ty **cần cải thiện** cho các thực tập sinh sau?  
-- Nếu giới thiệu cho bạn bè, bạn có **khuyên họ thực tập ở đây không**? Vì sao?  
+**6. Giá trị tổng thể của chương trình**
+Điều làm chương trình trở nên đặc biệt giá trị là sự kết hợp giữa:
 
+* thực hành AWS hands-on
+* worklog/reporting có cấu trúc
+* cơ hội tham gia technical events
+* quá trình phản tư qua self-assessment
 
-### Đề xuất & mong muốn
-- Bạn có đề xuất gì để cải thiện trải nghiệm trong kỳ thực tập?  
-- Bạn có muốn tiếp tục chương trình này trong tương lai?
-- Góp ý khác (tự do chia sẻ):
+Điều đó giúp tôi vừa có kiến thức thực tế, vừa hiểu rõ hơn cách học hiệu quả trong lĩnh vực kỹ thuật.
+
+---
+
+### Điều tôi hài lòng nhất
+
+* Lộ trình học rõ ràng từ AWS fundamentals đến các chủ đề kiến trúc có tính kết nối cao hơn
+* Cơ hội tham gia workshop để mở rộng góc nhìn vượt ra ngoài bài lab hằng tuần
+* Sự cân bằng giữa guided learning và tự khám phá
+
+### Đề xuất cải thiện
+
+* Nếu có thêm các mốc checkpoint review ở giữa kỳ, intern sẽ dễ chỉnh nội dung sớm hơn thay vì dồn hoàn thiện về cuối.
+* Nếu có thêm các buổi peer sharing hoặc mini demo ngắn, intern sẽ có cơ hội luyện kỹ năng giao tiếp thường xuyên hơn.
+* Một trang tổng hợp các lỗi AWS thường gặp và các hướng troubleshooting mẫu sẽ rất hữu ích.
+
+### Chia sẻ cuối cùng
+
+Nếu giới thiệu chương trình này cho một bạn sinh viên khác, tôi vẫn sẽ khuyên nên tham gia vì chương trình không chỉ cho tiếp xúc kỹ thuật mà còn tạo được một cấu trúc học tập, ghi chép và phản tư khá tốt. Đây là một trải nghiệm đặc biệt hữu ích với những ai muốn xây nền tảng AWS vững hơn và hiểu cách việc học chuyển hóa thành thói quen làm việc kỹ thuật thực tế.

@@ -1,44 +1,41 @@
 ---
-title: "Events Participated"
-date: 2024-01-01
+title: "Attended Events"
+date: 2026-07-20
 weight: 4
 chapter: false
 pre: " <b> 4. </b> "
 ---
+This section summarizes the technical events and community activities I participated in during my learning journey with **First Cloud AI Journey (FCAJ)**. These events are highly valuable as they complement the weekly worklog by providing a broader perspective on **AI applications, cloud architecture, modernization strategies, and product thinking**.
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy it verbatim** for your report, including this warning.
-{{% /notice %}}
+During this period, I attended two notable events:
 
-> In this section, you should list and describe in detail the events you have participated in during your internship or work experience.  
-> 
-> Each event should be presented in the format Event 1, Event 2, Event 3…, along with the following details:
-> * Event name
-> * Date and time
-> * Location (if applicable)
-> * Your role in the event (attendee, event support, speaker, etc.)
-> * A brief description of the event’s content and main activities
-> * Outcomes or value gained (lessons learned, new skills, contribution to the team/project)
-> * This listing helps demonstrate your actual participation as well as the soft skills and experience you have gained from each event.
+### [Event 1](4.1-Event1/)
+&emsp;**Event Name:** AWS FCAJ Community Day Workshop
 
-During my internship, I participated in two events. Each one was a memorable experience that provided new, interesting, and useful knowledge, along with gifts and wonderful moments.
+&emsp;**Time:** Half-day workshop, from 08:30 AM to 12:00 PM
 
-### [Event 1](4.1-Event1/)  
-&emsp;**Event Name:** GenAI-powered App-DB Modernization workshop  
+&emsp;**Location:** AWS Workshop Event
 
-&emsp;**Date & Time:** 09:00, August 13, 2025  
+&emsp;**Role:** Attendee
 
-&emsp;**Location:** 26th Floor, Bitexco Tower, 02 Hai Trieu Street, Saigon Ward, Ho Chi Minh City  
-
-&emsp;**Role:** Attendee  
+&emsp;**Key Topics:** AI context, product development journey at LotusHacks, Amazon CloudFront, Amazon QuickSight, LLM non-determinism, and enterprise multi-agent systems.
 
 ---
 
-### [Event 2](4.2-Event2/)  
-&emsp;**Event Name:** GenAI-powered App-DB Modernization workshop  
+### [Event 2](4.2-Event2/)
+&emsp;**Event Name:** Cloud Architect - Game Show
 
-&emsp;**Date & Time:** 09:00, August 13, 2025  
+&emsp;**Time:** 09:00 AM, June 20, 2026
 
-&emsp;**Location:** 26th Floor, Bitexco Tower, 02 Hai Trieu Street, Saigon Ward, Ho Chi Minh City  
+&emsp;**Location:** 26th Floor, Bitexco Financial Tower, 02 Hai Trieu Street, Ben Nghe Ward, District 1, Ho Chi Minh City
 
-&emsp;**Role:** Attendee  
+&emsp;**Role:** Contestant
+
+&emsp;**Key Topics:** 
+- Reinforce foundational knowledge of cloud services (AWS) and architectural design patterns.
+- Cultivate analytical thinking and requirement gathering skills to select optimal technology solutions under time pressure.
+- Enhance teamwork, strategic communication, and risk management skills in a competitive environment.
+
+---
+
+Through these two events, I not only gained deeper technical knowledge but also broadened my perspective on how AWS technologies bridge the gap between product development, modern software architecture, and real-world enterprise challenges.

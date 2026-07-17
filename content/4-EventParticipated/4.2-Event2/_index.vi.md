@@ -1,125 +1,73 @@
 ---
-title: "Event 2"
-date: 2024-01-01
-weight: 1
+title: "Event 2: Cloud Architect - Game Show"
+date: 2026-06-20
+weight: 3
 chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
-# Bài thu hoạch “GenAI-powered App-DB Modernization workshop”
+# Bài thu hoạch “Event 7: Cloud Architect - Game Show”
 
 ### Mục Đích Của Sự Kiện
 
-- Chia sẻ best practices trong thiết kế ứng dụng hiện đại
-- Giới thiệu phương pháp DDD và event-driven architecture
-- Hướng dẫn lựa chọn compute services phù hợp
-- Giới thiệu công cụ AI hỗ trợ development lifecycle
+- Củng cố kiến thức nền tảng về các dịch vụ đám mây (AWS) và các mẫu thiết kế kiến trúc hệ thống.
+- Rèn luyện tư duy phân tích tình huống, bóc tách yêu cầu nghiệp vụ để lựa chọn giải pháp công nghệ tối ưu dưới áp lực thời gian.
+- Tăng cường kỹ năng làm việc nhóm, giao tiếp chiến lược và khả năng quản trị rủi ro trong môi trường thi đấu đối kháng.
 
-### Danh Sách Diễn Giả
+### Ban Tổ Chức & Thành Phần Tham Dự
 
-- **Jignesh Shah** - Director, Open Source Databases
-- **Erica Liu** - Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** - Assc. Specialist SA, Serverless Amazon Web Services
+- **Ban Tổ Chức** - AWS Study Group
+- **Người chơi** - 8 đội thi đấu (mỗi đội gồm 5 thành viên được tuyển chọn ngẫu nhiên sau vòng đăng ký)
+- **Vai trò** - Thí sinh tham gia thi đấu
 
 ### Nội Dung Nổi Bật
 
-#### Đưa ra các ảnh hưởng tiêu cực của kiến trúc ứng dụng cũ
+#### Thể thức thi đấu đối kháng (Head-to-Head)
+- 8 đội được chia cặp thi đấu loại trực tiếp. Các đội luân phiên trả lời các bộ câu hỏi tình huống (case study) với mức độ khó tăng dần.
+- Đội tích lũy được nhiều điểm số hơn sẽ giành quyền bước vào vòng trong. 
+- **Quy tắc Tie-breaker**: Nếu kết thúc bộ đề mà hai đội hòa điểm, "Câu hỏi số 11" (Sudden Death) sẽ được tung ra. Đội nào bấm chuông và đưa ra đáp án chính xác nhanh hơn sẽ lập tức giành chiến thắng.
 
-- Thời gian release sản phẩm lâu → Mất doanh thu/bỏ lỡ cơ hội
-- Hoạt động kém hiệu quả → Mất năng suất, tốn kém chi phí
-- Không tuân thủ các quy định về bảo mật → Mất an ninh, uy tín
+#### Trọng tâm chuyên môn: AWS Service Selection
+- Các câu hỏi không nặng về lý thuyết suông mà đặt người chơi vào bối cảnh thực tế. Ví dụ: "Hệ thống đang gặp tình trạng nghẽn cổ chai khi xử lý đơn hàng ngày Black Friday, yêu cầu decouple các microservices mà không làm mất data, nên sử dụng AWS SQS hay Amazon Kinesis?".
+- Đòi hỏi thí sinh phải nắm rõ các giới hạn (limits), đặc tính và phương thức tính phí của từng dịch vụ AWS để đưa ra quyết định kiến trúc chuẩn xác nhất.
 
-#### Chuyển đổi sang kiến trúc ứng dụng mới - Microservice Architecture
-
-Chuyển đổi thành hệ thống modular – từng chức năng là một **dịch vụ độc lập** giao tiếp với nhau qua **sự kiện** với 3 trụ cột cốt lõi:
-
-- **Queue Management**: Xử lý tác vụ bất đồng bộ
-- **Caching Strategy:** Tối ưu performance
-- **Message Handling:** Giao tiếp linh hoạt giữa services
-
-#### Domain-Driven Design (DDD)
-
-- **Phương pháp 4 bước**: Xác định domain events → sắp xếp timeline → identify actors → xác định bounded contexts
-- **Case study bookstore**: Minh họa cách áp dụng DDD thực tế
-- **Context mapping**: 7 patterns tích hợp bounded contexts
-
-#### Event-Driven Architecture
-
-- **3 patterns tích hợp**: Publish/Subscribe, Point-to-point, Streaming
-- **Lợi ích**: Loose coupling, scalability, resilience
-- **So sánh sync vs async**: Hiểu rõ trade-offs (sự đánh đổi)
-
-#### Compute Evolution
-
-- **Shared Responsibility Model**: Từ EC2 → ECS → Fargate → Lambda
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value
-- **Functions vs Containers**: Criteria lựa chọn phù hợp
-
-#### Amazon Q Developer
-
-- **SDLC automation**: Từ planning đến maintenance
-- **Code transformation**: Java upgrade, .NET modernization
-- **AWS Transform agents**: VMware, Mainframe, .NET migration
+#### Chiến thuật quản trị rủi ro qua bộ Kỹ năng
+- **Rủi ro tối thiểu (1 lượt/trận)**: Kỹ năng phòng thủ. Sử dụng cho các câu hỏi mà nhóm còn mơ hồ hoặc có nhiều giả định chưa chắc chắn. Nếu trả lời sai, hệ thống bảo toàn điểm (không bị trừ). Nếu đúng, nhóm nhận được 1/2 số điểm của câu hỏi đó.
+- **Ngôi sao hi vọng (1 lượt/trận)**: Kỹ năng tấn công (High risk, High reward). Kích hoạt khi nhóm đã phân tích triệt để bài toán và tự tin 100% vào đáp án. Trả lời đúng nhận điểm nhân đôi (x2), trả lời sai bị trừ số điểm tương ứng (x2).
 
 ### Những Gì Học Được
 
-#### Tư Duy Thiết Kế
-
-- **Business-first approach**: Luôn bắt đầu từ business domain, không phải technology
-- **Ubiquitous language**: Importance của common vocabulary giữa business và tech teams
-- **Bounded contexts**: Cách identify và manage complexity trong large systems
+#### Tư Duy Thiết Kế Hệ Thống
+- **Không đoán mò, không giấu sự mơ hồ**: Bối cảnh game show cho thấy việc vội vàng chọn một dịch vụ AWS chỉ vì "nghe có vẻ quen" thường dẫn đến mất điểm. Tư duy kiến trúc yêu cầu phải công khai mọi sự đánh đổi (trade-off) và bám sát vào yêu cầu gốc của đề bài.
+- **Tối giản và đúng mục tiêu**: Việc thiết kế kiến trúc cũng giống như viết code: giải pháp tốt nhất là giải pháp đơn giản nhất đáp ứng đúng nhu cầu. Không tự "vẽ" thêm các dịch vụ phức tạp nếu bài toán chỉ yêu cầu lưu trữ tĩnh (S3) thay vì một hệ thống file system đắt đỏ (EFS).
 
 #### Kiến Trúc Kỹ Thuật
+- Củng cố mạnh mẽ khả năng phân biệt use-case của các dịch vụ tương đồng trên AWS (ví dụ: khi nào dùng DynamoDB vs RDS, ALB vs NLB, CloudFront vs Global Accelerator).
+- Nhận thức rõ ràng về các "anti-patterns" trong thiết kế Cloud, đặc biệt là các lỗi thiết kế gây thâm hụt ngân sách hoặc tạo ra "single point of failure".
 
-- **Event storming technique**: Phương pháp thực tế để mô hình hóa quy trình kinh doanh
-- Sử dụng **Event-driven communication** thay vì synchronous calls
-- **Integration patterns**: Hiểu khi nào dùng sync, async, pub/sub, streaming
-- **Compute spectrum**: Criteria chọn từ VM → containers → serverless
-
-#### Chiến Lược Hiện Đại Hóa
-
-- **Phased approach**: Không rush, phải có roadmap rõ ràng
-- **7Rs framework**: Nhiều con đường khác nhau tùy thuộc vào đặc điểm của mỗi ứng dụng
-- **ROI measurement**: Cost reduction + business agility
+#### Chiến Lược & Teamwork
+- **Giao tiếp phẫu thuật**: Thời gian bàn luận ngắn đòi hỏi các thành viên phải giao tiếp trực diện, bỏ qua các ý kiến chung chung và đi thẳng vào việc xác minh tính khả thi của từng dịch vụ AWS.
+- **Quản lý rủi ro**: Học cách đánh giá độ tin cậy của luồng suy luận trước khi quyết định "xuống tiền" bằng thẻ *Ngôi sao hi vọng* hay lùi lại an toàn với thẻ *Rủi ro tối thiểu*.
 
 ### Ứng Dụng Vào Công Việc
-
-- **Áp dụng DDD** cho project hiện tại: Event storming sessions với business team
-- **Refactor microservices**: Sử dụng bounded contexts để identify service boundaries
-- **Implement event-driven patterns**: Thay thế một số sync calls bằng async messaging
-- **Serverless adoption**: Pilot AWS Lambda cho một số use cases phù hợp
-- **Try Amazon Q Developer**: Integrate vào development workflow để boost productivity
+- **Xây dựng test-case cho kiến trúc**: Áp dụng tư duy thi đấu vào công việc thực tế: trước khi quyết định tích hợp bất kỳ dịch vụ AWS nào vào dự án, cần phải liệt kê rõ các tiêu chí kiểm chứng (yêu cầu tải, chi phí, độ trễ) giống như việc giải quyết các case study trong game.
+- **Lập kế hoạch giải quyết vấn đề**: Khi đối mặt với các task phức tạp hoặc bug hệ thống, luôn tuân thủ nguyên tắc phân rã tình huống. Chia nhỏ vấn đề thành các bước kiểm tra (verify) rõ ràng thay vì đưa ra giải pháp một cách cảm tính.
 
 ### Trải nghiệm trong event
 
-Tham gia workshop **“GenAI-powered App-DB Modernization”** là một trải nghiệm rất bổ ích, giúp tôi có cái nhìn toàn diện về cách hiện đại hóa ứng dụng và cơ sở dữ liệu bằng các phương pháp và công cụ hiện đại. Một số trải nghiệm nổi bật:
+Tham gia **Cloud Architect Game Show** mang lại một lăng kính hoàn toàn khác biệt so với các buổi hội thảo một chiều. Đây là nơi tư duy thiết kế kiến trúc bị đưa vào vòng thử thách thực chiến dưới áp lực thời gian. 
 
-#### Học hỏi từ các diễn giả có chuyên môn cao
-- Các diễn giả đến từ AWS và các tổ chức công nghệ lớn đã chia sẻ **best practices** trong thiết kế ứng dụng hiện đại.
-- Qua các case study thực tế, tôi hiểu rõ hơn cách áp dụng **Domain-Driven Design (DDD)** và **Event-Driven Architecture** vào các project lớn.
+#### Sự tương đồng với triết lý lập trình
+Điểm thú vị nhất của sự kiện là nó phản ánh chính xác triết lý làm việc mà tôi luôn theo đuổi: "Thận trọng luôn quan trọng hơn Tốc độ". Đứng trước một đề bài kiến trúc hóc búa, sự thôi thúc phải bấm chuông trả lời nhanh rất lớn. Tuy nhiên, nhóm chúng tôi đã thống nhất nguyên tắc: tuyệt đối không đưa ra đáp án dựa trên phán đoán mơ hồ. Mọi quyết định lựa chọn (ví dụ chọn Lambda thay vì EC2) đều phải dựa trên những giả định rõ ràng được bóc tách từ chính "bẫy" ngôn từ của đề bài. 
 
-#### Trải nghiệm kỹ thuật thực tế
-- Tham gia các phiên trình bày về **event storming** giúp tôi hình dung cách **mô hình hóa quy trình kinh doanh** thành các domain events.
-- Học cách **phân tách microservices** và xác định **bounded contexts** để quản lý sự phức tạp của hệ thống lớn.
-- Hiểu rõ trade-offs giữa **synchronous và asynchronous communication** cũng như các pattern tích hợp như **pub/sub, point-to-point, streaming**.
-
-#### Ứng dụng công cụ hiện đại
-- Trực tiếp tìm hiểu về **Amazon Q Developer**, công cụ AI hỗ trợ SDLC từ lập kế hoạch đến maintenance.
-- Học cách **tự động hóa code transformation** và pilot serverless với **AWS Lambda**, từ đó nâng cao năng suất phát triển.
-
-#### Kết nối và trao đổi
-- Workshop tạo cơ hội trao đổi trực tiếp với các chuyên gia, đồng nghiệp và team business, giúp **nâng cao ngôn ngữ chung (ubiquitous language)** giữa business và tech.
-- Qua các ví dụ thực tế, tôi nhận ra tầm quan trọng của **business-first approach**, luôn bắt đầu từ nhu cầu kinh doanh thay vì chỉ tập trung vào công nghệ.
+#### Phối hợp nhóm và ra quyết định
+Làm việc cùng 4 thành viên khác trong nhóm là một trải nghiệm giao tiếp tuyệt vời. Việc tranh luận để loại trừ các đáp án sai diễn ra rất căng thẳng nhưng vô cùng logic. Khoảnh khắc đáng nhớ nhất là khi cả nhóm quyết định kích hoạt *Rủi ro tối thiểu* cho một câu hỏi phân bổ tải mạng phức tạp, và sử dụng *Ngôi sao hi vọng* đúng thời điểm cho một tình huống thiết kế decoupling quen thuộc, từ đó lật ngược thế cờ.
 
 #### Bài học rút ra
-- Việc áp dụng DDD và event-driven patterns giúp giảm **coupling**, tăng **scalability** và **resilience** cho hệ thống.
-- Chiến lược hiện đại hóa cần **phased approach** và đo lường **ROI**, không nên vội vàng chuyển đổi toàn bộ hệ thống.
-- Các công cụ AI như Amazon Q Developer có thể **boost productivity** nếu được tích hợp vào workflow phát triển hiện tại.
+- Việc hiểu rõ ngọn ngành một dịch vụ (bản chất, điểm mạnh, điểm yếu) quan trọng hơn việc biết tên của hàng chục dịch vụ khác nhau. 
+- Trong kiến trúc hệ thống cũng như trong lập trình, mọi quyết định thay đổi hoặc tích hợp công nghệ đều phải có khả năng kiểm chứng rõ ràng. Không tự ý áp dụng các mẫu kiến trúc phức tạp nếu một giải pháp tối thiểu đã có thể giải quyết trọn vẹn bài toán.
 
 #### Một số hình ảnh khi tham gia sự kiện
-* Thêm các hình ảnh của các bạn tại đây
-> Tổng thể, sự kiện không chỉ cung cấp kiến thức kỹ thuật mà còn giúp tôi thay đổi cách tư duy về thiết kế ứng dụng, hiện đại hóa hệ thống và phối hợp hiệu quả hơn giữa các team.
+![Ảnh chụp tại sự kiện](/images/4-EventParticipated/event2.jpg)
+
+> Tổng thể, sự kiện không chỉ là một sân chơi giải trí mà còn là một bài kiểm tra thực tế sắc bén. Nó củng cố niềm tin của tôi vào nguyên tắc làm việc hướng mục tiêu, đặt tính chính xác và tư duy phân tích thận trọng lên hàng đầu khi đối mặt với bất kỳ hệ thống đám mây nào.

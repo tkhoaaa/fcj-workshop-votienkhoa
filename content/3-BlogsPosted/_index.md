@@ -1,22 +1,14 @@
 ---
 title: "Blogs Posted"
-date: 2024-01-01
+date: 2026-07-20
 weight: 3
 chapter: false
 pre: " <b> 3. </b> "
 ---
+This section lists and introduces the blogs about how **LingoRise** — an AI-powered IELTS/TOEIC preparation platform — is built and operated on AWS.
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
+###  [Blog 1 - Building LingoRise on AWS: A Serverless Architecture for IELTS/TOEIC Prep](3.1-Blog1/)
+This blog walks through the end-to-end serverless architecture behind LingoRise: Route53 + ACM + Amplify serving the Next.js frontend, API Gateway forwarding to a single Express-on-Lambda backend, Cognito for managed authentication, S3 for asset storage, and AWS WAF as an L7 shield. It explains the concrete benefit each AWS service buys a small team — pay-per-invoke compute, scale-to-zero cost, managed auth, and defense in depth — and why serverless wins for spiky, exam-day traffic.
 
-This section will list and introduce the blogs you have posted to [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj). For example:
-
-###  [Blog 1 - SESSION POLICIES IN AMAZON EKS POD IDENTITY](3.1-Blog1/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
-
-###  [Blog 2 - ...](3.2-Blog2/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
-
-###  [Blog 3 - ...](3.3-Blog3/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+###  [Blog 2 - Serverless AI on AWS: How LingoRise Generates & Grades Exams](3.2-Blog2/)
+This blog covers the AI content pipeline: how Lambda orchestrates AI calls with a pre-generate-and-cache strategy, why the function is sized at 1024 MB / 120 s, how Amazon Polly neural TTS synthesizes listening-section audio without a server, and how S3 signed URLs plus lifecycle rules deliver and expire generated assets. It closes on cost and resilience — caching to cut AI spend, rate limiting, and graceful fallback.

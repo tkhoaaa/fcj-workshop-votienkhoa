@@ -1,46 +1,40 @@
 ---
 title: "Các events đã tham gia"
-date: 2024-01-01
+date: 2026-07-20
 weight: 4
 chapter: false
 pre: " <b> 4. </b> "
 ---
+Phần này tóm tắt các sự kiện kỹ thuật và hoạt động cộng đồng mà tôi đã tham gia trong quá trình học tập cùng **First Cloud AI Journey (FCAJ)**. Những sự kiện này rất có giá trị vì chúng bổ sung cho phần worklog hằng tuần bằng góc nhìn rộng hơn về **AI applications, cloud architecture, modernization strategies và product thinking**.
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
-> Trong phần này, các bạn cần liệt kê và mô tả chi tiết các sự kiện (event) mà mình đã tham gia trong suốt quá trình thực tập hoặc làm việc. 
-> 
-> Mỗi sự kiện nên được trình bày theo định dạng Event 1, Event 2, Event 3…, kèm theo các thông tin:
-> * Tên sự kiện
-> * Thời gian tổ chức
-> * Địa điểm (nếu có)
-> * Vai trò của bạn trong sự kiện (người tham dự, hỗ trợ tổ chức, diễn giả, v.v.)
-> * Mô tả ngắn gọn nội dung và hoạt động chính trong sự kiện
-> * Kết quả hoặc giá trị đạt được (bài học, kỹ năng mới, đóng góp cho nhóm/dự án)
-> * Việc liệt kê này giúp thể hiện rõ sự tham gia thực tế của bạn, cũng như các kỹ năng mềm và kinh nghiệm bạn đã tích lũy qua từng sự kiện.
-
-
-Trong quá trình thực tập, em đã tham gia 2 events, với mỗi event là một trải nghiệm đáng nhớ với những kiến thức mới, hay và bổ ích, cùng với đó là nhứng món quà và những khoảnh khắc rất tuyệt vời.
+Trong giai đoạn này, tôi đã tham gia hai sự kiện đáng chú ý:
 
 ### [Event 1](4.1-Event1/)
-&emsp;**Tên sự kiện:** GenAI-powered App-DB Modernization workshop
+&emsp;**Tên sự kiện:** AWS FCAJ Community Day Workshop
 
-&emsp;**Thời gian:** 09:00 ngày 13/08/2025
+&emsp;**Thời gian:** Workshop nửa ngày, từ 08:30 AM - 12:00 PM
 
-&emsp;**Địa điểm:** Tầng 26, tòa nhà Bitexco, số 02 đường Hải Triều, phường Sài Gòn, thành phố Hồ Chí Minh
+&emsp;**Địa điểm:** Sự kiện workshop tại AWS
 
-&emsp;**Vai trò trong sự kiện:** Người tham dự 
+&emsp;**Vai trò:** Người tham dự
 
+&emsp;**Chủ đề chính:** AI context, hành trình xây dựng sản phẩm tại LotusHacks, Amazon CloudFront, Amazon Quick, LLM non-determinism và enterprise multi-agent systems
 
+---
 
 ### [Event 2](4.2-Event2/)
-&emsp;**Tên sự kiện:** GenAI-powered App-DB Modernization workshop
+&emsp;**Tên sự kiện:** Cloud Architect - Game Show
 
-&emsp;**Thời gian:** 09:00 ngày 13/08/2025
+&emsp;**Thời gian:** 09:00 ngày 20/06/2026
 
 &emsp;**Địa điểm:** Tầng 26, tòa nhà Bitexco, số 02 đường Hải Triều, phường Sài Gòn, thành phố Hồ Chí Minh
 
-&emsp;**Vai trò trong sự kiện:** Người tham dự 
+&emsp;**Vai trò:** Người thi đấu
 
+&emsp;**Chủ đề chính:** - Củng cố kiến thức nền tảng về các dịch vụ đám mây (AWS) và các mẫu thiết kế kiến trúc hệ thống.
+- Rèn luyện tư duy phân tích tình huống, bóc tách yêu cầu nghiệp vụ để lựa chọn giải pháp công nghệ tối ưu dưới áp lực thời gian.
+- Tăng cường kỹ năng làm việc nhóm, giao tiếp chiến lược và khả năng quản trị rủi ro trong môi trường thi đấu đối kháng.
+
+---
+
+Thông qua hai sự kiện này, tôi không chỉ tiếp nhận thêm kiến thức kỹ thuật mà còn mở rộng góc nhìn về cách công nghệ AWS được kết nối với việc xây dựng sản phẩm, kiến trúc phần mềm hiện đại và các bài toán doanh nghiệp.

@@ -1,47 +1,61 @@
 ---
 title: "Sharing and Feedback"
-date: 2024-01-01
+date: 2026-07-20
 weight: 7
 chapter: false
 pre: " <b> 7. </b> "
 ---
-
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
-
-> Here, you can freely share your personal opinions about your experience participating in the First Cloud AI Journey program. This will help the FCAJ team improve any shortcomings based on the following aspects:
+This section reflects my personal feedback about the **First Cloud AI Journey** internship experience. Overall, I consider this program highly valuable because it combines technical practice, community learning, and self-development in a structured way.
 
 ### Overall Evaluation
 
-**1. Working Environment**  
-The working environment is very friendly and open. FCAJ members are always willing to help whenever I encounter difficulties, even outside working hours. The workspace is tidy and comfortable, helping me focus better. However, I think it would be nice to have more social gatherings or team bonding activities to strengthen relationships.
+**1. Learning Environment**  
+The learning environment was positive, supportive, and motivating. The program structure encouraged me to not only complete tasks, but also understand why each topic mattered. Having a clear journey from fundamentals to more advanced topics like private connectivity and architecture reflection helped me stay focused.
 
-**2. Support from Mentor / Team Admin**  
-The mentor provides very detailed guidance, explains clearly when I don’t understand, and always encourages me to ask questions. The admin team supports administrative tasks, provides necessary documents, and creates favorable conditions for me to work effectively. I especially appreciate that the mentor allows me to try and solve problems myself instead of just giving the answer.
+**2. Support from Mentors / Program Team**  
+The support from the mentor and program team was very meaningful. Guidance was available when needed, but there was also enough space for self-exploration. This balance was important because it helped me build both technical confidence and independence.
 
-**3. Relevance of Work to Academic Major**  
-The tasks I was assigned align well with the knowledge I learned at university, while also introducing me to new areas I had never encountered before. This allowed me to both strengthen my foundational knowledge and gain practical skills.
+**3. Relevance to My Academic Major**  
+The internship aligned well with my Information Technology background, especially in cloud computing, networking, and system thinking. At the same time, it expanded my exposure to areas I had not deeply practiced before, such as observability, architecture documentation, and AI-related workshop topics.
 
-**4. Learning & Skill Development Opportunities**  
-During the internship, I learned many new skills such as using project management tools, teamwork skills, and professional communication in a corporate environment. The mentor also shared valuable real-world experiences that helped me better plan my career path.
+**4. Learning and Skill Development Opportunities**  
+The program created many opportunities to grow across multiple dimensions:
 
-**5. Company Culture & Team Spirit**  
-The company culture is very positive: everyone respects each other, works seriously but still keeps things enjoyable. When there are urgent projects, everyone works together and supports one another regardless of their position. This made me feel like a real part of the team, even as an intern.
+* AWS technical skills
+* documentation and reporting
+* workshop participation
+* architectural thinking
+* self-learning discipline
 
-**6. Internship Policies / Benefits**  
-The company provides an internship allowance and offers flexible working hours when needed. In addition, having the opportunity to join internal training sessions is a big plus.
+This made the internship feel more complete than a narrow task-only experience.
+
+**5. Community and Team Spirit**  
+One of the most positive aspects was the FCAJ community atmosphere. Community workshops, technical sharing, and peer learning made the experience more engaging and less isolated. I felt that the environment encouraged curiosity and continuous improvement.
+
+**6. Program Value**  
+What made the program especially valuable was the combination of:
+
+* hands-on AWS practice
+* structured worklog/reporting
+* exposure to technical events
+* reflection through self-assessment
+
+This gave me both practical knowledge and a better understanding of how to learn effectively in a technical field.
 
 ---
 
-### Additional Questions
-- What did you find **most satisfying** during your internship?  
-- What do you think the company **should improve** for future interns?  
-- If recommending to a friend, would you **suggest they intern here**? Why or why not?  
+### What I Appreciated Most
 
----
+* The clear learning progression from AWS fundamentals to more connected architecture topics
+* The opportunity to attend workshops and expand my perspective beyond weekly lab work
+* The balance between guided learning and self-driven exploration
 
-### Suggestions & Expectations
-- Do you have any suggestions to improve the internship experience?  
-- Would you like to continue this program in the future?  
-- Any other comments (free sharing):
+### Suggestions for Improvement
+
+* It would be helpful to have more intermediate checkpoint reviews so interns can refine content earlier.
+* More short peer-sharing sessions or mini demos could help interns practice communication more regularly.
+* A consolidated reference page for common AWS mistakes and troubleshooting patterns would be very useful.
+
+### Final Thoughts
+
+If I were recommending this program to another student, I would recommend it because it provides not only technical exposure, but also a disciplined structure for learning, documenting, and reflecting. It is especially useful for students who want to build a stronger foundation in AWS and understand how learning translates into real engineering habits.

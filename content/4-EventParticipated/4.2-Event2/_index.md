@@ -1,126 +1,73 @@
 ---
-title: "Event 2"
-date: 2024-01-01
-weight: 1
+title: "Event 2: Cloud Architect - Game Show"
+date: 2026-06-20
+weight: 3
 chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy it verbatim** into your report, including this warning.
-{{% /notice %}}
+# Event Reflection: "Event 7: Cloud Architect - Game Show"
 
-# Summary Report: “GenAI-powered App-DB Modernization workshop”
+### Purpose of the Event
 
-### Event Objectives
+- Reinforce foundational knowledge of cloud services (AWS) and system architecture design patterns.
+- Sharpen situational analysis, breaking down business requirements to choose the optimal technical solution under time pressure.
+- Strengthen teamwork, strategic communication, and risk management in a competitive, head-to-head environment.
 
-- Share best practices in modern application design
-- Introduce Domain-Driven Design (DDD) and event-driven architecture
-- Provide guidance on selecting the right compute services
-- Present AI tools to support the development lifecycle
+### Organizers & Participants
 
-### Speakers
+- **Organizer** - AWS Study Group
+- **Players** - 8 competing teams (each team had 5 members, randomly selected after the registration round)
+- **Role** - Competing contestant
 
-- **Jignesh Shah** – Director, Open Source Databases
-- **Erica Liu** – Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** – Assc. Specialist SA, Serverless Amazon Web Services
+### Highlights
 
-### Key Highlights
+#### Head-to-Head competition format
+- The 8 teams were paired for direct elimination matches. Teams took turns answering sets of case-study questions with increasing difficulty.
+- The team that accumulated more points advanced to the next round.
+- **Tie-breaker rule**: If two teams finished the question set tied on points, "Question 11" (Sudden Death) was released. Whichever team buzzed in and gave the correct answer first won immediately.
 
-#### Identifying the drawbacks of legacy application architecture
+#### Technical focus: AWS Service Selection
+- The questions weren't about dry theory; they put players in real-world scenarios. For example: "A system is hitting a bottleneck processing orders on Black Friday and needs to decouple its microservices without losing data. Should you use AWS SQS or Amazon Kinesis?"
+- Contestants had to know the limits, characteristics, and pricing model of each AWS service to make the most accurate architectural decision.
 
-- Long product release cycles → Lost revenue/missed opportunities  
-- Inefficient operations → Reduced productivity, higher costs  
-- Non-compliance with security regulations → Security breaches, loss of reputation  
+#### Risk-management tactics through the Skill set
+- **Minimum Risk (1 use per match)**: A defensive skill. Used for questions where the team was still uncertain or working from shaky assumptions. A wrong answer preserved the score (no deduction). A correct answer earned half the points for that question.
+- **Star of Hope (1 use per match)**: An offensive skill (high risk, high reward). Activated when the team had fully analyzed the problem and was 100% confident in the answer. A correct answer earned double points (x2); a wrong answer deducted the corresponding points (x2).
 
-#### Transitioning to modern application architecture – Microservices
+### What I Learned
 
-Migrating to a modular system — each function is an **independent service** communicating via **events**, built on three core pillars:
-
-- **Queue Management**: Handle asynchronous tasks  
-- **Caching Strategy**: Optimize performance  
-- **Message Handling**: Flexible inter-service communication  
-
-#### Domain-Driven Design (DDD)
-
-- **Four-step method**: Identify domain events → arrange timeline → identify actors → define bounded contexts  
-- **Bookstore case study**: Demonstrates real-world DDD application  
-- **Context mapping**: 7 patterns for integrating bounded contexts  
-
-#### Event-Driven Architecture
-
-- **3 integration patterns**: Publish/Subscribe, Point-to-point, Streaming  
-- **Benefits**: Loose coupling, scalability, resilience  
-- **Sync vs async comparison**: Understanding the trade-offs  
-
-#### Compute Evolution
-
-- **Shared Responsibility Model**: EC2 → ECS → Fargate → Lambda  
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value  
-- **Functions vs Containers**: Criteria for appropriate choice  
-
-#### Amazon Q Developer
-
-- **SDLC automation**: From planning to maintenance  
-- **Code transformation**: Java upgrade, .NET modernization  
-- **AWS Transform agents**: VMware, Mainframe, .NET migration  
-
-### Key Takeaways
-
-#### Design Mindset
-
-- **Business-first approach**: Always start from the business domain, not the technology  
-- **Ubiquitous language**: Importance of a shared vocabulary between business and tech teams  
-- **Bounded contexts**: Identifying and managing complexity in large systems  
+#### System Design Thinking
+- **Don't guess, don't hide uncertainty**: The game-show setting showed that rushing to pick an AWS service just because it "sounds familiar" usually costs points. Architectural thinking requires surfacing every trade-off and staying anchored to the original requirements.
+- **Minimal and on-target**: Designing architecture is like writing code: the best solution is the simplest one that meets the actual need. Don't "invent" extra complex services when the problem only calls for static storage (S3) rather than an expensive file system (EFS).
 
 #### Technical Architecture
+- Strongly reinforced my ability to distinguish the use cases of similar AWS services (for example: when to use DynamoDB vs RDS, ALB vs NLB, CloudFront vs Global Accelerator).
+- Gained a clear awareness of cloud design "anti-patterns," especially design mistakes that blow the budget or create a "single point of failure."
 
-- **Event storming technique**: Practical method for modeling business processes  
-- Use **event-driven communication** instead of synchronous calls  
-- **Integration patterns**: When to use sync, async, pub/sub, streaming  
-- **Compute spectrum**: Criteria for choosing between VM, containers, and serverless  
+#### Strategy & Teamwork
+- **Surgical communication**: Short discussion windows forced members to communicate directly, skip vague opinions, and go straight to verifying the feasibility of each AWS service.
+- **Risk management**: Learned to assess the reliability of a line of reasoning before deciding to "go all in" with the *Star of Hope* card or to play it safe with the *Minimum Risk* card.
 
-#### Modernization Strategy
+### Applying It to My Work
+- **Building test cases for architecture**: Applying the competition mindset to real work: before deciding to integrate any AWS service into a project, I need to spell out the verification criteria (load requirements, cost, latency) just like solving the case studies in the game.
+- **Planning problem-solving**: When facing complex tasks or system bugs, always follow the principle of decomposing the situation. Break the problem into clear verification steps instead of offering a solution based on gut feeling.
 
-- **Phased approach**: No rushing — follow a clear roadmap  
-- **7Rs framework**: Multiple modernization paths depending on the application  
-- **ROI measurement**: Cost reduction + business agility  
+### My Experience at the Event
 
-### Applying to Work
+Taking part in the **Cloud Architect Game Show** offered a completely different lens compared to one-way seminars. This was where architectural design thinking got thrown into a real, time-pressured challenge.
 
-- **Apply DDD** to current projects: Event storming sessions with business teams  
-- **Refactor microservices**: Use bounded contexts to define service boundaries  
-- **Implement event-driven patterns**: Replace some sync calls with async messaging  
-- **Adopt serverless**: Pilot AWS Lambda for suitable use cases  
-- **Try Amazon Q Developer**: Integrate into the dev workflow to boost productivity  
+#### Parallels with my programming philosophy
+The most interesting thing about the event was how precisely it reflected the working philosophy I always follow: "Caution matters more than Speed." Facing a tricky architecture question, the urge to buzz in and answer fast is strong. But our team agreed on a principle: never give an answer based on vague guessing. Every choice (for example, picking Lambda over EC2) had to rest on clear assumptions extracted from the wording "traps" in the question itself.
 
-### Event Experience
-
-Attending the **“GenAI-powered App-DB Modernization”** workshop was extremely valuable, giving me a comprehensive view of modernizing applications and databases using advanced methods and tools. Key experiences included:
-
-#### Learning from highly skilled speakers
-- Experts from AWS and major tech organizations shared **best practices** in modern application design.  
-- Through real-world case studies, I gained a deeper understanding of applying **DDD** and **Event-Driven Architecture** to large projects.  
-
-#### Hands-on technical exposure
-- Participating in **event storming** sessions helped me visualize how to **model business processes** into domain events.  
-- Learned how to **split microservices** and define **bounded contexts** to manage large-system complexity.  
-- Understood trade-offs between **synchronous and asynchronous communication** and integration patterns like **pub/sub, point-to-point, streaming**.  
-
-#### Leveraging modern tools
-- Explored **Amazon Q Developer**, an AI tool for SDLC support from planning to maintenance.  
-- Learned to **automate code transformation** and pilot serverless with **AWS Lambda** to improve productivity.  
-
-#### Networking and discussions
-- The workshop offered opportunities to exchange ideas with experts, peers, and business teams, enhancing the **ubiquitous language** between business and tech.  
-- Real-world examples reinforced the importance of the **business-first approach** rather than focusing solely on technology.  
+#### Team coordination and decision-making
+Working with the other 4 members of my team was a great communication experience. Debating to eliminate wrong answers was tense but deeply logical. The most memorable moment was when the team decided to activate *Minimum Risk* on a complex network load-distribution question, and used *Star of Hope* at just the right time on a familiar decoupling design scenario, turning the game around.
 
 #### Lessons learned
-- Applying DDD and event-driven patterns reduces **coupling** while improving **scalability** and **resilience**.  
-- Modernization requires a **phased approach** with **ROI measurement**; rushing the process can be risky.  
-- AI tools like Amazon Q Developer can significantly **boost productivity** when integrated into the current workflow.  
+- Truly understanding one service inside out (its nature, strengths, and weaknesses) matters more than knowing the names of dozens of different services.
+- In system architecture, as in programming, every decision to change or integrate a technology must be clearly verifiable. Don't apply complex architecture patterns on a whim if a minimal solution can fully solve the problem.
 
-#### Some event photos
-*Add your event photos here*  
+#### A few photos from the event
+![Photo taken at the event](/images/4-EventParticipated/event2.jpg)
 
-> Overall, the event not only provided technical knowledge but also helped me reshape my thinking about application design, system modernization, and cross-team collaboration.
+> Overall, the event wasn't just an entertaining playground but a sharp, practical test. It reinforced my belief in goal-oriented working principles, putting accuracy and careful analytical thinking first when facing any cloud system.

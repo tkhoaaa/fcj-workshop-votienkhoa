@@ -1,39 +1,49 @@
 ---
 title: "Self-Assessment"
-date: 2024-01-01
+date: 2026-07-20
 weight: 6
 chapter: false
 pre: " <b> 6. </b> "
 ---
+During my internship in the **Workforce Bootcamp - First Cloud AI Journey** program, I had the opportunity to strengthen both my technical foundation and my professional working habits. Over 12 weeks, I worked through topics such as **AWS account security, VPC networking, EC2, EBS, S3, EFS, IAM, CloudWatch, CloudTrail, VPC Endpoints, Route 53, documentation, and technical reporting**.
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy it verbatim** into your report, including this warning.
-{{% /notice %}}
+Beyond technical growth, I also improved how I:
 
-During my internship at **[Company/Organization Name]** from **[start date]** to **[end date]**, I had the opportunity to learn, practice, and apply the knowledge acquired in school to a real-world working environment.  
-I participated in **[briefly describe the main project or task]**, through which I improved my skills in **[list skills: programming, analysis, reporting, communication, etc.]**.  
+* learn independently
+* document work clearly
+* connect multiple AWS services into one architecture
+* present technical ideas in a more structured way
+* reflect on mistakes and improve from feedback
 
-In terms of work ethic, I always strived to complete tasks well, complied with workplace regulations, and actively engaged with colleagues to improve work efficiency.
+To evaluate my internship period more objectively, I assess myself using the following criteria:
 
-To objectively reflect on my internship period, I would like to evaluate myself based on the following criteria:
+| No. | Criteria | Description | Good | Fair | Average |
+| --- | --- | --- | --- | --- | --- |
+| 1 | **Professional knowledge & skills** | Understanding AWS services and applying them in practical lab scenarios | ✅ | ☐ | ☐ |
+| 2 | **Ability to learn** | Learning new services and concepts quickly through workshops, labs, and documentation | ✅ | ☐ | ☐ |
+| 3 | **Proactiveness** | Taking initiative to explore solutions, read extra materials, and improve content quality | ✅ | ☐ | ☐ |
+| 4 | **Sense of responsibility** | Completing assigned tasks, updating worklogs, and preparing report materials carefully | ✅ | ☐ | ☐ |
+| 5 | **Discipline** | Following schedules, maintaining learning continuity, and respecting internship expectations | ✅ | ☐ | ☐ |
+| 6 | **Progressive mindset** | Receiving feedback positively and continuously refining technical and written content | ✅ | ☐ | ☐ |
+| 7 | **Communication** | Explaining ideas, writing documentation, and presenting technical understanding | ✅ | ☐ | ☐ |
+| 8 | **Teamwork** | Participating in the FCAJ environment and learning from workshop/community sharing | ✅ | ☐ | ☐ |
+| 9 | **Professional conduct** | Maintaining a respectful and serious attitude toward learning and collaboration | ✅ | ☐ | ☐ |
+| 10 | **Problem-solving skills** | Troubleshooting configuration, permission, and architecture issues step by step | ✅ | ☐ | ☐ |
+| 11 | **Contribution to project/team** | Producing useful report content, workshop notes, and structured technical documentation | ✅ | ☐ | ☐ |
+| 12 | **Overall** | Overall growth and internship outcome | ✅ | ☐ | ☐ |
 
-| No. | Criteria                            | Description                                                                                      | Good | Fair | Average |
-| --- | ----------------------------------- | ------------------------------------------------------------------------------------------------ | ---- | ---- | ------- |
-| 1   | **Professional knowledge & skills** | Understanding of the field, applying knowledge in practice, proficiency with tools, work quality | ✅    | ☐    | ☐       |
-| 2   | **Ability to learn**                | Ability to absorb new knowledge and learn quickly                                                | ☐    | ✅    | ☐       |
-| 3   | **Proactiveness**                   | Taking initiative, seeking out tasks without waiting for instructions                            | ✅    | ☐    | ☐       |
-| 4   | **Sense of responsibility**         | Completing tasks on time and ensuring quality                                                    | ✅    | ☐    | ☐       |
-| 5   | **Discipline**                      | Adhering to schedules, rules, and work processes                                                 | ☐    | ☐    | ✅       |
-| 6   | **Progressive mindset**             | Willingness to receive feedback and improve oneself                                              | ☐    | ✅    | ☐       |
-| 7   | **Communication**                   | Presenting ideas and reporting work clearly                                                      | ☐    | ✅    | ☐       |
-| 8   | **Teamwork**                        | Working effectively with colleagues and participating in teams                                   | ✅    | ☐    | ☐       |
-| 9   | **Professional conduct**            | Respecting colleagues, partners, and the work environment                                        | ✅    | ☐    | ☐       |
-| 10  | **Problem-solving skills**          | Identifying problems, proposing solutions, and showing creativity                                | ☐    | ✅    | ☐       |
-| 11  | **Contribution to project/team**    | Work effectiveness, innovative ideas, recognition from the team                                  | ✅    | ☐    | ☐       |
-| 12  | **Overall**                         | General evaluation of the entire internship period                                               | ✅    | ☐    | ☐       |
+### Strengths
 
-### Needs Improvement
+* I was able to build a solid AWS foundation and gradually connect services instead of learning them in isolation.
+* I showed strong willingness to learn and consistently improved the quality of my worklog and workshop documentation.
+* I became more confident in understanding cloud architecture from both implementation and reporting perspectives.
 
-* Strengthen discipline and strictly comply with the rules and regulations of the company or any organization  
-* Improve problem-solving thinking  
-* Enhance communication skills in both daily interactions and professional contexts, including handling situations effectively
+### Areas to Improve
+
+* Improve communication further, especially when simplifying technical concepts for non-technical audiences.
+* Strengthen troubleshooting speed by gaining more repeated hands-on exposure.
+* Develop stronger discipline in planning review checkpoints earlier instead of polishing too much near the end.
+
+### Final Reflection
+
+Overall, I consider this internship a very meaningful learning period. It helped me move from basic AWS familiarity toward a more structured understanding of cloud architecture, private connectivity, observability, and technical communication. I also became more aware of the importance of documentation, security thinking, and continuous self-improvement in an engineering environment.

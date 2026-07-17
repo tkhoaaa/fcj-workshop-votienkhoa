@@ -1,31 +1,52 @@
 ---
-title: "Workshop"
-date: 2024-01-01
-weight: 5
-chapter: false
-pre: " <b> 5. </b> "
+title : "Workshop"
+date : 2024-01-01
+weight : 5
+chapter : false
+pre : " <b> 5. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-# Secure Hybrid Access to S3 using VPC Endpoints
+# Deploying LingoRise — A Serverless English-Learning Platform on AWS
 
 #### Overview
 
-**AWS PrivateLink** provides private connectivity to AWS services from VPCs and your on-premises networks, without exposing your traffic to the Public Internet.
+LingoRise is an IELTS/English-learning web application that helps learners practice reading, writing, listening, and speaking with AI-assisted grading and exam simulation. In this workshop you will deploy the entire platform on AWS using a serverless-first architecture.
 
-In this lab, you will learn how to create, configure, and test VPC endpoints that enable your workloads to reach AWS services without traversing the Public Internet.
+The backend runs on **AWS Lambda (Node.js 20)** behind **Amazon API Gateway (REST)**, with authentication handled by **Amazon Cognito**. Application data lives in **Amazon RDS for PostgreSQL 16**, while static assets are stored in **Amazon S3** and served through **Amazon CloudFront**. The frontend is hosted on **AWS Amplify Hosting**, application secrets are kept in **AWS Systems Manager (SSM) Parameter Store**, and observability is provided by **Amazon CloudWatch**. Everything is packaged and shipped with **AWS SAM** (Serverless Application Model).
 
-You will create two types of endpoints to access Amazon S3: a Gateway VPC endpoint, and an Interface VPC endpoint. These two types of VPC endpoints offer different benefits depending on if you are accessing Amazon S3 from the cloud or your on-premises location
-+ **Gateway** - Create a gateway endpoint to send traffic to Amazon S3 or DynamoDB using private IP addresses.You route traffic from your VPC to the gateway endpoint using route tables.
-+ **Interface** - Create an interface endpoint to send traffic to endpoint services that use a Network Load Balancer to distribute traffic. Traffic destined for the endpoint service is resolved using DNS.
+By the end of this workshop you will have a working, publicly reachable deployment of LingoRise running in the **ap-southeast-1** region under the **dev** stage, with the SAM stack named **lingorise-dev**. You will provision the database, load secrets, deploy the API, publish the frontend, wire up asset delivery, run a smoke test, and finally clean everything up.
+
+Because the architecture is serverless, you gain real benefits over a traditional server setup:
+
+- **Pay-per-use** — you are billed for requests and compute time actually consumed, not for idle servers.
+- **No servers to manage** — no patching, no capacity planning for the compute layer; AWS operates the runtime.
+- **Scales to zero and beyond** — Lambda scales down to nothing when idle and scales out automatically under load.
+
+![LingoRise serverless architecture on AWS](/images/Workshop-LingoRise/1-introduction/architecture.jpg)
+
+#### Architecture
+
+The deployment uses the following AWS services:
+
+- **AWS Lambda (Node.js 20)** — runs the LingoRise API business logic.
+- **Amazon API Gateway (REST)** — public HTTPS entry point that routes requests to Lambda.
+- **Amazon Cognito** — user sign-up, sign-in, and JWT-based authorization.
+- **Amazon RDS for PostgreSQL 16** — relational database (`lingorise-dev-db`, DB name `lingorise`).
+- **Amazon S3** — asset storage (bucket `lingorise-assets-dev-<accountId>`).
+- **Amazon CloudFront** — CDN in front of S3 for fast, cached asset delivery.
+- **AWS Amplify Hosting** — builds and serves the frontend web application.
+- **AWS Systems Manager (SSM) Parameter Store** — application configuration and secrets under `/lingorise/dev/`.
+- **Amazon CloudWatch** — logs and metrics for Lambda and the rest of the stack.
+- **AWS SAM** — infrastructure-as-code for packaging and deploying the backend.
 
 #### Content
 
-1. [Workshop overview](5.1-Workshop-overview)
-2. [Prerequiste](5.2-Prerequiste/)
-3. [Access S3 from VPC](5.3-S3-vpc/)
-4. [Access S3 from On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (Bonus)](5.5-Policy/)
-6. [Clean up](5.6-Cleanup/)
+1. [Introduction & Architecture](1-introduction/)
+2. [Prerequisites](2-prerequisites/)
+3. [Secrets & SSM Parameter Store](3-secrets-ssm/)
+4. [Database — RDS PostgreSQL](4-database-rds/)
+5. [Backend — AWS SAM Deploy](5-backend-sam/)
+6. [Frontend — AWS Amplify Hosting](6-frontend-amplify/)
+7. [Storage & CloudFront (Bonus)](7-storage-cloudfront/)
+8. [Smoke Test & Operations](8-smoke-test/)
+9. [Clean up](9-cleanup/)

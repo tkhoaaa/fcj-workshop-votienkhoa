@@ -1,126 +1,42 @@
 ---
-title: "Event 1"
-date: 2024-01-01
+title: "Event 1: AWS First Cloud AI Journey — Community Day"
+date: 2026-07-23
 weight: 1
 chapter: false
 pre: " <b> 4.1. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy it verbatim** into your report, including this warning.
-{{% /notice %}}
+# AWS First Cloud AI Journey — Community Day
 
-# Summary Report: “GenAI-powered App-DB Modernization workshop”
+I spent a whole Saturday morning up on the 26th floor of Bitexco for the AWS First Cloud AI Journey Community Day, and honestly it was one of the more useful mornings I've had outside of my everyday internship tasks. It was organized by the AWS Study Group, and the room was a mix of cloud architects, GenAI engineers, DevOps people, and students like me who were mostly there to soak things up and pick up whatever we could. I went as a participant, not expecting much beyond the usual "here's a cool AWS service" pitches. But that's not how it went, which is why I bothered to sit down and write this.
 
-### Event Objectives
 
-- Share best practices in modern application design
-- Introduce Domain-Driven Design (DDD) and event-driven architecture
-- Provide guidance on selecting the right compute services
-- Present AI tools to support the development lifecycle
+## The sessions that actually stuck with me
 
-### Speakers
+There were six talks across the morning, from 8:30 to noon. Some landed harder than others, so I'll be honest about which ones actually got to me.
 
-- **Jignesh Shah** – Director, Open Source Databases
-- **Erica Liu** – Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** – Assc. Specialist SA, Serverless Amazon Web Services
+**"Context Is Everything" by Tinh Truong (GoTymeX).** This is the one I keep thinking about. His argument was that when AI hands you garbage, it's usually not the model's fault, it's that you didn't give it enough to understand the real problem. He broke context down into your goal, your situation, your constraints, and the relevant evidence, and the line that stuck with me was "context turns a vague request into a solvable problem." What I liked was that he also warned against the opposite mistake, what he called the "internet puller" problem, where people paste an entire PDF and fifty screenshots into one chat box and then wonder why the answers keep getting worse. More context doesn't mean better context. As someone guilty of exactly this habit, I felt a little called out, but I needed it.
 
-### Key Highlights
+**"GenAI-Powered Auto Audit for AWS Workload" by Pham Nguyen Hai Anh (G-AsiaPacific).** This one leaned more enterprise than I usually care about, but the way she described business-user pain points was sharp. She walked through Amazon Q Business, the natural-language querying, the 40-plus data connectors, the guardrails, and a demo of a PM assistant that drafts meeting minutes and schedules the next meeting on its own. I'll admit the deeper auto-audit details went a bit over my head, but the general idea of pointing an LLM at your own infrastructure to sniff out compliance gaps felt very practical.
 
-#### Identifying the drawbacks of legacy application architecture
+**"From Edge to Origin: CloudFront as Your Foundation" by Nguyen Tuan Thinh.** I walked in thinking CloudFront was just "that CDN thing," and walked out a little scared, in a good way. The point about the pay-as-you-go paradox stuck with me: the 1TB free tier is generous, but a viral spike or a DDoS attack can turn into a five-figure bill overnight. The horror-story numbers he threw out (over $100K in extreme cases) are the kind of thing that makes you go set up billing alerts right away. Which I actually did, more on that below.
 
-- Long product release cycles → Lost revenue/missed opportunities  
-- Inefficient operations → Reduced productivity, higher costs  
-- Non-compliance with security regulations → Security breaches, loss of reputation  
+**"36 hrs with LotusHacks: Building UTMorpho" by Team VIB.** This was the fun one, and probably the one the whole room enjoyed most. The team retold their 36-hour hackathon run from "hour zero with a blank mind" to a working demo, and they were refreshingly honest about the bugs and the panic in the middle. The idea of focusing on solving a single problem instead of piling on features is something I need to hear over and over, because I always want to add this and that.
 
-#### Transitioning to modern application architecture – Microservices
+**"Non-Determinism of 'Deterministic' LLM Settings" by Duc Dao (Cloud Kinetics).** This one quietly untangled a knot for me. He explained why setting temperature to 0 still doesn't give you identical outputs, basically because floating-point addition running in parallel across GPU cores isn't associative, so shifting the order of the sum a little is enough to skew the probabilities and change the chosen token. Add server load balancing and hardware drift at the API layer on top of that. I sat there realizing this is exactly why my LingoRise exam generator occasionally spits out slightly malformed JSON even when I thought I'd locked everything down.
 
-Migrating to a modular system — each function is an **independent service** communicating via **events**, built on three core pillars:
+**"Enterprise-Grade Multi-Agent System" by Vy Lam (VPBank).** This was the most tightly structured talk, about credit scoring for startups. The core problem is that banks demand three-plus years of financial statements and startups just don't have them, so they get rejected even when they're very promising. Her solution was a "virtual credit committee" of specialized agents, a financial analyst, an IP evaluator, a risk auditor, working together under a central orchestration layer, instead of one single agent carrying everything. She also laid out a five-layer security model, perimeter, network, identity, application, and data, which was a lot to absorb but a good checklist.
 
-- **Queue Management**: Handle asynchronous tasks  
-- **Caching Strategy**: Optimize performance  
-- **Message Handling**: Flexible inter-service communication  
+## What I actually took away
 
-#### Domain-Driven Design (DDD)
+The thread connecting almost every talk was this: the model is rarely the hard part. Context, memory, reliability, and guardrails are where the real work lives. That made me look at my own project differently.
 
-- **Four-step method**: Identify domain events → arrange timeline → identify actors → define bounded contexts  
-- **Bookstore case study**: Demonstrates real-world DDD application  
-- **Context mapping**: 7 patterns for integrating bounded contexts  
+A few things mapped straight onto LingoRise:
 
-#### Event-Driven Architecture
+- The multi-agent talk validated a choice I'd accidentally half-gotten right. I split LingoRise's AI logic into a separate exam-generation flow and a separate Writing-assessment flow, and it turns out that's exactly the "split into specialists" instinct Vy Lam was arguing for, just at a smaller scale.
+- Duc's non-determinism talk finally explained why I built that `extractJsonObject()` regex fallback parser back in Week 5. At the time it felt like a patchy hack. Now I understand it's a legitimate defense against LLM output drift, and I feel a lot more at ease keeping it around.
+- The security session lined up neatly with the hardening I did in Week 10, rate limiting, input validation, prompt-injection defense. Hearing enterprise folks describe the exact layers I'd been fumbling toward on my own was pretty reassuring.
+- And after the CloudFront talk I went home, set up billing alerts properly, and looked into Origin Access Control for my S3 resources. That's a very dry, very useful outcome, and exactly the kind of thing I wouldn't have prioritized on my own if I hadn't gone.
 
-- **3 integration patterns**: Publish/Subscribe, Point-to-point, Streaming  
-- **Benefits**: Loose coupling, scalability, resilience  
-- **Sync vs async comparison**: Understanding the trade-offs  
-
-#### Compute Evolution
-
-- **Shared Responsibility Model**: EC2 → ECS → Fargate → Lambda  
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value  
-- **Functions vs Containers**: Criteria for appropriate choice  
-
-#### Amazon Q Developer
-
-- **SDLC automation**: From planning to maintenance  
-- **Code transformation**: Java upgrade, .NET modernization  
-- **AWS Transform agents**: VMware, Mainframe, .NET migration  
-
-### Key Takeaways
-
-#### Design Mindset
-
-- **Business-first approach**: Always start from the business domain, not the technology  
-- **Ubiquitous language**: Importance of a shared vocabulary between business and tech teams  
-- **Bounded contexts**: Identifying and managing complexity in large systems  
-
-#### Technical Architecture
-
-- **Event storming technique**: Practical method for modeling business processes  
-- Use **event-driven communication** instead of synchronous calls  
-- **Integration patterns**: When to use sync, async, pub/sub, streaming  
-- **Compute spectrum**: Criteria for choosing between VM, containers, and serverless  
-
-#### Modernization Strategy
-
-- **Phased approach**: No rushing — follow a clear roadmap  
-- **7Rs framework**: Multiple modernization paths depending on the application  
-- **ROI measurement**: Cost reduction + business agility  
-
-### Applying to Work
-
-- **Apply DDD** to current projects: Event storming sessions with business teams  
-- **Refactor microservices**: Use bounded contexts to define service boundaries  
-- **Implement event-driven patterns**: Replace some sync calls with async messaging  
-- **Adopt serverless**: Pilot AWS Lambda for suitable use cases  
-- **Try Amazon Q Developer**: Integrate into the dev workflow to boost productivity  
-
-### Event Experience
-
-Attending the **“GenAI-powered App-DB Modernization”** workshop was extremely valuable, giving me a comprehensive view of modernizing applications and databases using advanced methods and tools. Key experiences included:
-
-#### Learning from highly skilled speakers
-- Experts from AWS and major tech organizations shared **best practices** in modern application design.  
-- Through real-world case studies, I gained a deeper understanding of applying **DDD** and **Event-Driven Architecture** to large projects.  
-
-#### Hands-on technical exposure
-- Participating in **event storming** sessions helped me visualize how to **model business processes** into domain events.  
-- Learned how to **split microservices** and define **bounded contexts** to manage large-system complexity.  
-- Understood trade-offs between **synchronous and asynchronous communication** and integration patterns like **pub/sub, point-to-point, streaming**.  
-
-#### Leveraging modern tools
-- Explored **Amazon Q Developer**, an AI tool for SDLC support from planning to maintenance.  
-- Learned to **automate code transformation** and pilot serverless with **AWS Lambda** to improve productivity.  
-
-#### Networking and discussions
-- The workshop offered opportunities to exchange ideas with experts, peers, and business teams, enhancing the **ubiquitous language** between business and tech.  
-- Real-world examples reinforced the importance of the **business-first approach** rather than focusing solely on technology.  
-
-#### Lessons learned
-- Applying DDD and event-driven patterns reduces **coupling** while improving **scalability** and **resilience**.  
-- Modernization requires a **phased approach** with **ROI measurement**; rushing the process can be risky.  
-- AI tools like Amazon Q Developer can significantly **boost productivity** when integrated into the current workflow.  
-
-#### Some event photos
-*Add your event photos here*  
-
-> Overall, the event not only provided technical knowledge but also helped me reshape my thinking about application design, system modernization, and cross-team collaboration.
+#### A few photos from the event
+![Photo taken at the event](/images/4-EventParticipated/event1.jpg)
