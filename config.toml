@@ -1,8 +1,9 @@
-baseURL = "https://workshop-sample.fcjuni.com/"
+# GitHub Pages project site URL
+baseURL = "https://tkhoaaa.github.io/fcj-workshop-votienkhoa/"
 relativeURLs = false
 canonifyURLs = false
 defaultContentLanguage = "en"
-disableLanguages = [] 
+disableLanguages = []
 buildFuture = true
 
 # Khai báo Theme
@@ -34,7 +35,7 @@ home = [ "HTML", "RSS", "JSON"]
     contentDir = "content"
     title = "Internship Report"
     weight = 1
-    label = "English"
+    languageName = "English"
 
     # Các liên kết nhanh ở dưới cùng menu bên trái (giống mẫu)
     [[languages.en.menu.shortcuts]]
@@ -53,7 +54,7 @@ home = [ "HTML", "RSS", "JSON"]
     contentDir = "content"
     title = "Báo cáo thực tập"
     weight = 2
-    label = "Tiếng Việt"
+    languageName = "Tiếng Việt"
 
     [[languages.vi.menu.shortcuts]]
       name = "<i class='fab fa-aws'></i> AWS Study Group - Blog"
