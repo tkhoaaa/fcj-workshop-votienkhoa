@@ -26,6 +26,24 @@ LingoRise sử dụng kiến trúc AWS Serverless hoàn toàn tại **ap-southea
 
 ![LingoRise System Architecture](/images/2-Proposal/architecture.jpg)
 
+### Demo sản phẩm
+
+Video demo ứng dụng web **LingoRise**: trải nghiệm học viên, luồng làm bài thi và các màn hình chính chạy trên stack AWS serverless mô tả ở trên.
+
+Mở folder demo trên Google Drive (file video nằm trong folder):
+
+👉 **[Folder video demo — LingoRise](https://drive.google.com/drive/folders/1p3dhFRWf3rbgyNnlVk-R2KkELfWrA1Ce?usp=drive_link)**
+
+<iframe src="https://drive.google.com/embeddedfolderview?id=1p3dhFRWf3rbgyNnlVk-R2KkELfWrA1Ce#list" style="width:100%; height:360px; border:1px solid #ddd; border-radius:8px;"></iframe>
+
+File trực tiếp trong folder:
+
+- [Demo - LingoRise.rar](https://drive.google.com/file/d/1E_IZUdorBI1V4vdOZ9DhxBGWPW_uLa1q/view?usp=sharing) (tải / mở trên Drive)
+
+{{% notice note %}}
+Nếu khung folder Drive không hiển thị trên trình duyệt, hãy dùng link Google Drive ở trên. Muốn phát video ngay trên trang sau này, hãy upload file `.mp4` đã giải nén (không dùng `.rar`) và bật quyền **Anyone with the link**.
+{{% /notice %}}
+
 *Dịch vụ AWS sử dụng*
 - *Amazon API Gateway (REST)*: Endpoint HTTPS công khai đứng trước mọi Lambda handler.
 - *AWS Lambda (Node.js 20)*: Compute không trạng thái cho toàn bộ handler backend (auth, exams, courses, admin, payments, health).

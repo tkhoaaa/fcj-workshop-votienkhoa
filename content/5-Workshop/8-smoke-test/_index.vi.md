@@ -171,6 +171,12 @@ aws budgets create-budget \
 
 ![Cấu hình cảnh báo AWS Budgets](/images/Workshop-LingoRise/8-smoke-test/budget-alarm.png)
 
+#### Video demo sản phẩm
+
+Xem walkthrough đầy đủ ứng dụng web LingoRise (luồng học viên và màn hình thi) tại mục **Demo sản phẩm** trong [Proposal](/2-proposal/) hoặc mở folder Drive:
+
+👉 [Folder demo LingoRise](https://drive.google.com/drive/folders/1p3dhFRWf3rbgyNnlVk-R2KkELfWrA1Ce?usp=drive_link)
+
 #### Kiểm tra
 
 Bạn hoàn tất chương này khi: `GET /auth/me` trả về `401` khi không có token và `200` khi có token, `GET /courses` trả về `200`, bạn đã đi qua đăng nhập → khoá học → bắt đầu bài thi trong ứng dụng Amplify và thấy các handler tương ứng chạy trong `/aws/lambda/lingorise-dev-*`, và cảnh báo AWS Budgets của bạn đã được tạo.

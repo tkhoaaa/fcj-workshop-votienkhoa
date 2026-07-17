@@ -26,6 +26,24 @@ LingoRise uses a fully serverless AWS architecture in **ap-southeast-1**. User t
 
 ![LingoRise System Architecture](/images/2-Proposal/architecture.jpg)
 
+### Product Demo
+
+Video walkthrough of the **LingoRise** web application: learner experience, exam flow, and key product screens running on the AWS serverless stack described above.
+
+Open the demo folder on Google Drive (video file inside):
+
+👉 **[Demo video folder — LingoRise](https://drive.google.com/drive/folders/1p3dhFRWf3rbgyNnlVk-R2KkELfWrA1Ce?usp=drive_link)**
+
+<iframe src="https://drive.google.com/embeddedfolderview?id=1p3dhFRWf3rbgyNnlVk-R2KkELfWrA1Ce#list" style="width:100%; height:360px; border:1px solid #ddd; border-radius:8px;"></iframe>
+
+Direct file in the folder:
+
+- [Demo - LingoRise.rar](https://drive.google.com/file/d/1E_IZUdorBI1V4vdOZ9DhxBGWPW_uLa1q/view?usp=sharing) (download / open from Drive)
+
+{{% notice note %}}
+If the embedded folder view does not load in your browser, use the Google Drive link above. For in-page playback later, upload the extracted `.mp4` (not `.rar`) with **Anyone with the link** access.
+{{% /notice %}}
+
 ### AWS Services Used
 - **Amazon API Gateway (REST)**: Public HTTPS endpoint fronting every Lambda handler.
 - **AWS Lambda (Node.js 20)**: Stateless compute for all backend handlers (auth, exams, courses, admin, payments, health).

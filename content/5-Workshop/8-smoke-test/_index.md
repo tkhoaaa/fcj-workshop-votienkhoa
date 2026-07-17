@@ -171,6 +171,12 @@ aws budgets create-budget \
 
 ![AWS Budgets alarm configuration](/images/Workshop-LingoRise/8-smoke-test/budget-alarm.png)
 
+#### Product demo video
+
+For a full walkthrough of the live LingoRise web app (learner flow and exam screens), see the **Product Demo** section in the [Proposal](/2-proposal/) or open the Drive folder:
+
+👉 [LingoRise demo folder](https://drive.google.com/drive/folders/1p3dhFRWf3rbgyNnlVk-R2KkELfWrA1Ce?usp=drive_link)
+
 #### Verify
 
 You are done with this chapter when: `GET /auth/me` returns `401` without a token and `200` with one, `GET /courses` returns `200`, you have walked login → courses → start exam in the Amplify app and watched the matching handlers fire in `/aws/lambda/lingorise-dev-*`, and your AWS Budgets alarm is created.
