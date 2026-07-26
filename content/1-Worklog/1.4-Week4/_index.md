@@ -7,92 +7,99 @@ pre: "<b>1.4. </b>"
 ---
 ### Week 4 Objectives:
 
-* Explore AWS storage services such as S3 and EFS.
-* Understand the difference between object storage and file storage.
-* Connect storage services to compute workloads in meaningful ways.
+* Understand the modern software delivery workflow (DevOps) on AWS through CodeCommit, CodeBuild, and CodePipeline.
+* Build a CI/CD pipeline that automates testing and deployment of source code to a running environment.
+* Use Amazon CloudWatch to create a monitoring dashboard and configure alarms for the workload.
+* Deploy a complete frontend and backend web application through the automated pipeline with high availability in mind.
 
 ### Tasks to be carried out this week:
 
 | Day | Task | Start Date | Completion Date | Reference Material |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Create Amazon S3 buckets and review bucket naming, object structure, and access control basics. | 11/05/2026 | 11/05/2026 | [Amazon S3 Docs](https://docs.aws.amazon.com/s3/) |
-| **2** | Enable Versioning and configure Lifecycle Rules for archival behavior. | 12/05/2026 | 12/05/2026 | [S3 Versioning](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html) |
-| **3** | Configure bucket access settings and review Bucket Policies for secure object access. | 13/05/2026 | 13/05/2026 | [S3 Bucket Policies](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-policy-language-overview.html) |
-| **4** | Host a static website using Amazon S3 and test public object delivery. | 14/05/2026 | 14/05/2026 | [Static Website Hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html) |
-| **5** | Create and mount Amazon EFS to EC2 instances to test shared file storage behavior. | 15/05/2026 | 15/05/2026 | [Amazon EFS Docs](https://docs.aws.amazon.com/efs/) |
+| **1** | Study the DevOps delivery model on AWS and the source, build, test, deploy stages; create an AWS CodeCommit repository for the lab application. | 11/05/2026 | 11/05/2026 | [AWS CodeCommit Docs](https://docs.aws.amazon.com/codecommit/) |
+| **2** | Create an AWS CodeBuild project, write `buildspec.yml`, and store build artifacts in an Amazon S3 artifact bucket. | 12/05/2026 | 12/05/2026 | [AWS CodeBuild Docs](https://docs.aws.amazon.com/codebuild/) |
+| **3** | Assemble an AWS CodePipeline with source, build, and deploy stages, and review the IAM service roles each stage assumes. | 13/05/2026 | 13/05/2026 | [AWS CodePipeline Docs](https://docs.aws.amazon.com/codepipeline/) |
+| **4** | Build a CloudWatch dashboard for the workload and configure alarms on CPU and error metrics with an Amazon SNS notification target. | 14/05/2026 | 14/05/2026 | [Amazon CloudWatch Docs](https://docs.aws.amazon.com/cloudwatch/) |
+| **5** | Deploy a full frontend and backend web application through the pipeline end to end and verify availability after an automated release. | 15/05/2026 | 15/05/2026 | [FCAJ Workshop](https://awsstudygroup.com/) |
 
 ### Detailed Implementation:
 
-#### 1. Store application and report assets in Amazon S3
+#### 1. Map the DevOps delivery model onto AWS services
 
-I created one or more **S3 buckets** to understand how AWS object storage works. Instead of attaching storage directly to a server, S3 stores objects independently and exposes them through APIs or URLs.
+Before touching the console, I wrote out the delivery stages and matched each one to a service. **AWS CodeCommit** holds the Git source, **AWS CodeBuild** compiles and tests it, and **AWS CodePipeline** orchestrates the order in which those stages run.
 
-I practiced:
+The mental model I settled on was:
 
-* Uploading files
-* Organizing objects by key path
-* Reviewing bucket-level and object-level access settings
+* **Source** -> a commit to a CodeCommit branch triggers the pipeline
+* **Build** -> CodeBuild runs install, test, and package commands in a managed container
+* **Deploy** -> the packaged artifact is released to the target environment
 
-This helped me understand that S3 is better suited for:
+The important detail is that the pipeline itself stores nothing. Every stage passes an artifact to the next stage through **Amazon S3**, and each stage acts under an **IAM** service role rather than my own credentials.
 
-* Static assets
-* Backups
-* Public website files
-* Durable object storage
+#### 2. Define the build with buildspec.yml and an artifact bucket
 
-#### 2. Apply object storage lifecycle and protection features
+I created a CodeBuild project pointing at the CodeCommit repository and described the build in `buildspec.yml` committed alongside the code. Keeping the build definition in the repository means the build changes together with the application.
 
-To make storage management more realistic, I enabled:
+```yaml
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands: [npm ci]
+  build:
+    commands: [npm test, npm run build]
+artifacts:
+  files: ['**/*']
+  base-directory: dist
+```
 
-* **Versioning** to keep multiple versions of the same object
-* **Lifecycle Rules** to move older objects to colder storage classes over time
+CodeBuild wrote the output to the S3 artifact bucket that CodePipeline provisioned, and streamed each phase into a **CloudWatch Logs** log group. When the test phase failed, the pipeline stopped at the build stage and the deploy stage never ran, which is exactly the safety property CI/CD is supposed to give.
 
-This connected storage operations with governance and cost optimization. It also showed how S3 can be used not just for storing files, but also for automating retention behavior.
+#### 3. Assemble the pipeline and review its IAM service roles
 
-#### 3. Use S3 for static website hosting
+In CodePipeline I chained the three stages and confirmed the trust relationships. The pipeline role can read the source and start builds; the CodeBuild role can write logs, read and write the artifact bucket, and reach the deployment target. Each role is separate, so a permission problem in the build stage cannot affect the source stage.
 
-I configured the S3 bucket for **static website hosting** and uploaded simple web content. This turned the bucket into a lightweight hosting platform for HTML and static assets.
+I then pushed a commit and watched the whole run without opening a terminal:
 
-The integration path this week became:
+```bash
+git push origin main
+aws codepipeline get-pipeline-state --name lingorise-lab-pipeline
+```
 
-* **Local files** -> **S3 bucket**
-* **Bucket policy/public access settings** -> control browser accessibility
-* **Web browser** -> retrieve static objects directly from S3
+This was the first week where a change reached a running environment without me deploying anything by hand.
 
-This was a practical example of how a storage service can act as a simple web delivery layer.
+#### 4. Monitor the workload with a CloudWatch dashboard and alarms
 
-#### 4. Connect EC2 instances to shared file storage with EFS
+With releases automated, the next question was whether the deployed application was healthy. I built a custom **Amazon CloudWatch** dashboard combining EC2 CPU utilization, request counts, and error metrics on one screen, then created alarms on CPU utilization and on the error metric. Both alarms publish to an **Amazon SNS** topic subscribed by email, so a breach becomes a notification instead of something I discover later.
 
-Unlike S3, **Amazon EFS** provides shared file storage that multiple EC2 instances can mount at the same time. I created or reviewed an EFS file system and mounted it to EC2 to understand shared application data patterns.
-
-This demonstrated the difference between:
-
-* **EBS** for block storage attached to one instance
-* **EFS** for shared file storage across multiple instances
-* **S3** for object-based storage accessed over APIs
+For the end-of-week practice I deployed a complete web application, frontend and backend, through the pipeline and confirmed it stayed reachable across an automated release. This is the rehearsal for the LingoRise delivery pipeline: **AWS SAM** packaging the Node.js 20 Lambda backend into the `lingorise-dev` stack, and **AWS Amplify Hosting** running its own CI/CD build on every push to the Next.js frontend. The service names differ, but the stages, the artifact handoff, and the CloudWatch alarms are the same shape.
 
 ### AWS Service Integration This Week:
 
-* **S3 + Bucket Policy:** Object access behavior was controlled through storage-level policies.
-* **S3 + Static Website Hosting:** Storage was used directly as a content delivery mechanism for static files.
-* **EC2 + EFS:** Compute instances mounted a shared network file system.
-* **S3 + Lifecycle/Versioning:** Storage management was combined with protection and archival automation.
-* **Storage + Cost Awareness:** Storage class and lifecycle behavior affected long-term cost efficiency.
+* **CodeCommit + CodePipeline:** A commit to the tracked branch became the automatic trigger for the entire release.
+* **CodeBuild + S3:** Build output was published as a versioned artifact that later stages consumed.
+* **CodeBuild + CloudWatch Logs:** Every build phase streamed into a log group, making failed tests readable after the fact.
+* **CodePipeline + IAM:** Each stage assumed a scoped service role instead of running under a developer identity.
+* **CloudWatch Alarms + SNS:** Threshold breaches on CPU and error metrics were delivered as email notifications.
+* **Pipeline + Deployed Application:** The running frontend and backend were updated only through the automated path, never manually.
 
 ### Week 4 Achievements:
 
-* Built a stronger understanding of the differences between **object**, **block**, and **file** storage on AWS.
-* Successfully used **S3** for object hosting and static web delivery.
-* Practiced protecting data through **Versioning** and **Lifecycle Rules**.
-* Mounted **EFS** to EC2 and understood how shared storage can support multiple workloads.
-* Prepared storage knowledge that would later be important for private S3 access in the workshop.
+* Built a working CI/CD pipeline covering source, build, test, and deploy on **CodeCommit**, **CodeBuild**, and **CodePipeline**.
+* Moved the build definition into the repository as `buildspec.yml` so builds are reproducible and reviewable.
+* Understood how artifacts flow between pipeline stages through an **S3** bucket rather than being rebuilt each time.
+* Created a custom **CloudWatch** dashboard plus CPU and error alarms wired to an **SNS** topic.
+* Deployed a complete frontend and backend application through the pipeline and verified it survived an automated release.
+* Connected the lab pipeline to the planned LingoRise delivery path using **AWS SAM** and **Amplify Hosting**.
 
 ### Challenges Faced:
 
-* S3 access behavior was initially confusing because public access settings, bucket policies, and object permissions all influence the final result.
-* EFS required understanding both AWS-side setup and OS-level mount configuration on EC2.
+* The first pipeline runs failed on permissions rather than on code, because the CodeBuild service role could not write to the artifact bucket. Reading the CloudWatch Logs output was faster than guessing at the policy.
+* Choosing alarm thresholds was harder than creating the alarms. Too tight and every deployment triggers a notification; too loose and a real problem goes unnoticed.
 
 ### Lessons Learned and Next Steps:
 
-* Different storage services solve very different problems, and choosing the correct one depends on the application access pattern.
-* In the next week, I would shift back toward **security and access control**, especially around IAM and permission design for AWS services.
+* Automation only helps if it fails loudly. A pipeline that stops at a failed test and an alarm that reaches someone are the two halves of the same idea.
+* Keeping the build definition and the deployment configuration in the repository makes the delivery process reviewable like any other code change.
+* In the next week, I would move from individual labs to the **project kickoff**: splitting tasks across the team, writing the project proposal, drawing the system architecture diagram, and scaffolding the source code together with the infrastructure as code.

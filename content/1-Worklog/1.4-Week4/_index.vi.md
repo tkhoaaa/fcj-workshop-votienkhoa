@@ -7,92 +7,99 @@ pre: " <b> 1.4. </b> "
 ---
 ### Mục tiêu tuần 4:
 
-* Tìm hiểu các dịch vụ lưu trữ của AWS như S3 và EFS.
-* Hiểu sự khác nhau giữa object storage và file storage.
-* Kết nối các dịch vụ lưu trữ với compute workload theo cách thực tế.
+* Hiểu quy trình phát triển phần mềm hiện đại (DevOps) trên AWS qua CodeCommit, CodeBuild và CodePipeline.
+* Xây dựng CI/CD pipeline tự động hóa việc kiểm thử và triển khai mã nguồn lên môi trường thực thi.
+* Dùng Amazon CloudWatch để tạo dashboard giám sát và cấu hình alarms cho workload.
+* Triển khai hoàn chỉnh một ứng dụng web (frontend và backend) qua pipeline tự động, hướng tới tính sẵn sàng cao.
 
 ### Các công việc cần triển khai trong tuần này:
 
 | Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Tạo Amazon S3 buckets và tìm hiểu bucket naming, object structure cùng access control cơ bản. | 11/05/2026 | 11/05/2026 | [Amazon S3 Docs](https://docs.aws.amazon.com/s3/) |
-| **2** | Bật Versioning và cấu hình Lifecycle Rules để mô phỏng hành vi lưu trữ lâu dài. | 12/05/2026 | 12/05/2026 | [S3 Versioning](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html) |
-| **3** | Cấu hình bucket access settings và tìm hiểu Bucket Policies để bảo vệ object access. | 13/05/2026 | 13/05/2026 | [S3 Bucket Policies](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-policy-language-overview.html) |
-| **4** | Dùng Amazon S3 để host static website và kiểm tra khả năng public object delivery. | 14/05/2026 | 14/05/2026 | [Static Website Hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html) |
-| **5** | Tạo và mount Amazon EFS vào EC2 instances để test shared file storage. | 15/05/2026 | 15/05/2026 | [Amazon EFS Docs](https://docs.aws.amazon.com/efs/) |
+| **1** | Tìm hiểu mô hình DevOps trên AWS và các stage source, build, test, deploy; tạo repository AWS CodeCommit cho ứng dụng lab. | 11/05/2026 | 11/05/2026 | [AWS CodeCommit Docs](https://docs.aws.amazon.com/codecommit/) |
+| **2** | Tạo project AWS CodeBuild, viết `buildspec.yml` và lưu build artifact vào artifact bucket trên Amazon S3. | 12/05/2026 | 12/05/2026 | [AWS CodeBuild Docs](https://docs.aws.amazon.com/codebuild/) |
+| **3** | Ghép AWS CodePipeline với các stage source, build, deploy và rà soát IAM service role mà từng stage assume. | 13/05/2026 | 13/05/2026 | [AWS CodePipeline Docs](https://docs.aws.amazon.com/codepipeline/) |
+| **4** | Xây dựng CloudWatch dashboard cho workload và cấu hình alarms trên CPU cùng error metric, gửi thông báo qua Amazon SNS. | 14/05/2026 | 14/05/2026 | [Amazon CloudWatch Docs](https://docs.aws.amazon.com/cloudwatch/) |
+| **5** | Triển khai trọn vẹn một ứng dụng web frontend và backend qua pipeline, kiểm tra tính sẵn sàng sau một lần release tự động. | 15/05/2026 | 15/05/2026 | [FCAJ Workshop](https://awsstudygroup.com/) |
 
 ### Cách thực hiện chi tiết:
 
-#### 1. Lưu trữ file và asset bằng Amazon S3
+#### 1. Ánh xạ mô hình DevOps sang các dịch vụ AWS
 
-Tôi tạo một hoặc nhiều **S3 bucket** để hiểu cách object storage hoạt động trên AWS. Thay vì gắn storage trực tiếp vào server, S3 lưu object độc lập và cho phép truy cập thông qua API hoặc URL.
+Trước khi mở console, tôi viết ra các stage của quy trình delivery và gán mỗi stage cho một dịch vụ. **AWS CodeCommit** giữ mã nguồn Git, **AWS CodeBuild** build và chạy test, còn **AWS CodePipeline** điều phối thứ tự chạy của các stage đó.
 
-Tôi thực hành:
+Mô hình tôi rút ra là:
 
-* Upload file
-* Tổ chức object theo key path
-* Kiểm tra quyền truy cập ở cấp bucket và object
+* **Source** -> một commit vào branch trên CodeCommit kích hoạt pipeline
+* **Build** -> CodeBuild chạy install, test và package trong container được quản lý
+* **Deploy** -> artifact đã đóng gói được phát hành lên môi trường đích
 
-Qua đó tôi hiểu S3 phù hợp hơn với:
+Điểm quan trọng là bản thân pipeline không lưu gì cả. Mỗi stage chuyển artifact cho stage sau thông qua **Amazon S3**, và từng stage hoạt động bằng một **IAM** service role chứ không dùng credential cá nhân của tôi.
 
-* Static assets
-* Backups
-* Public website files
-* Durable object storage
+#### 2. Định nghĩa build bằng buildspec.yml và artifact bucket
 
-#### 2. Áp dụng versioning và lifecycle cho object storage
+Tôi tạo project CodeBuild trỏ tới repository CodeCommit và mô tả quá trình build trong `buildspec.yml` được commit cùng mã nguồn. Đặt định nghĩa build trong repository giúp build thay đổi đồng bộ với ứng dụng.
 
-Để mô hình quản lý storage thực tế hơn, tôi bật:
+```yaml
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands: [npm ci]
+  build:
+    commands: [npm test, npm run build]
+artifacts:
+  files: ['**/*']
+  base-directory: dist
+```
 
-* **Versioning** để giữ nhiều version của cùng một object
-* **Lifecycle Rules** để tự động chuyển object cũ sang storage class phù hợp hơn
+CodeBuild ghi output vào artifact bucket S3 do CodePipeline tạo ra, đồng thời stream từng phase vào một log group của **CloudWatch Logs**. Khi phase test thất bại, pipeline dừng ngay ở build stage và deploy stage không chạy, đúng với tính chất an toàn mà CI/CD cần có.
 
-Điều này cho thấy storage không chỉ là nơi lưu file mà còn gắn với governance và cost optimization.
+#### 3. Ghép pipeline và rà soát các IAM service role
 
-#### 3. Dùng S3 làm static website hosting
+Trong CodePipeline tôi nối ba stage lại và kiểm tra các trust relationship. Pipeline role được đọc source và khởi động build; CodeBuild role được ghi log, đọc ghi artifact bucket và truy cập môi trường triển khai. Hai role tách biệt nên lỗi quyền ở build stage không ảnh hưởng tới source stage.
 
-Tôi cấu hình **static website hosting** cho bucket S3 và upload nội dung web đơn giản. Khi đó bucket trở thành một nền tảng nhẹ để host HTML và static assets.
+Sau đó tôi push một commit và theo dõi toàn bộ lần chạy mà không cần mở terminal thao tác tay:
 
-Luồng tích hợp dịch vụ của tuần này là:
+```bash
+git push origin main
+aws codepipeline get-pipeline-state --name lingorise-lab-pipeline
+```
 
-* **Local files** -> **S3 bucket**
-* **Bucket policy/public access settings** -> quyết định khả năng truy cập từ browser
-* **Web browser** -> lấy object trực tiếp từ S3
+Đây là tuần đầu tiên một thay đổi mã nguồn đi tới môi trường thực thi mà tôi không phải deploy thủ công.
 
-Đây là ví dụ rõ ràng cho việc một storage service có thể đóng vai trò phân phối nội dung web đơn giản.
+#### 4. Giám sát workload bằng CloudWatch dashboard và alarms
 
-#### 4. Kết nối EC2 với shared file storage bằng EFS
+Khi việc release đã tự động, câu hỏi tiếp theo là ứng dụng sau khi triển khai có khỏe hay không. Tôi xây dựng một dashboard **Amazon CloudWatch** gom CPU utilization của EC2, số lượng request và error metric trên cùng một màn hình, rồi tạo alarm cho CPU utilization và cho error metric. Cả hai alarm publish vào một topic **Amazon SNS** đã subscribe email, nhờ vậy một lần vượt ngưỡng trở thành thông báo thay vì điều tôi phát hiện muộn.
 
-Khác với S3, **Amazon EFS** cung cấp shared file storage mà nhiều EC2 instances có thể mount cùng lúc. Tôi tạo hoặc rà soát EFS file system và mount vào EC2 để hiểu pattern lưu trữ dùng chung cho workload.
-
-Từ đó tôi phân biệt rõ:
-
-* **EBS** là block storage gắn cho một instance
-* **EFS** là shared file storage dùng cho nhiều instance
-* **S3** là object storage truy cập qua API
+Phần thực hành cuối tuần, tôi triển khai hoàn chỉnh một ứng dụng web gồm frontend và backend qua pipeline và xác nhận ứng dụng vẫn truy cập được xuyên suốt một lần release tự động. Đây chính là bài tập dượt cho delivery pipeline của LingoRise: **AWS SAM** đóng gói backend Lambda Node.js 20 vào stack `lingorise-dev`, còn **AWS Amplify Hosting** chạy CI/CD riêng mỗi khi push frontend Next.js. Tên dịch vụ khác nhau, nhưng các stage, cách chuyển artifact và alarm trên CloudWatch đều cùng một hình dạng.
 
 ### Kết nối các dịch vụ AWS trong tuần này:
 
-* **S3 + Bucket Policy:** Quyền truy cập object được kiểm soát bằng storage-level policies.
-* **S3 + Static Website Hosting:** Storage được dùng trực tiếp như một lớp cung cấp nội dung web tĩnh.
-* **EC2 + EFS:** Compute instances mount cùng một network file system.
-* **S3 + Lifecycle/Versioning:** Quản lý lưu trữ được kết hợp với bảo vệ dữ liệu và tự động lưu trữ lâu dài.
-* **Storage + Cost Awareness:** Storage class và lifecycle behavior ảnh hưởng đến hiệu quả chi phí.
+* **CodeCommit + CodePipeline:** Một commit vào branch được theo dõi trở thành trigger tự động cho cả lần release.
+* **CodeBuild + S3:** Kết quả build được publish thành artifact để các stage sau tiêu thụ lại.
+* **CodeBuild + CloudWatch Logs:** Mọi build phase được stream vào log group, giúp đọc lại nguyên nhân test fail sau đó.
+* **CodePipeline + IAM:** Mỗi stage assume một service role giới hạn quyền thay vì chạy bằng danh tính của developer.
+* **CloudWatch Alarms + SNS:** Việc vượt ngưỡng CPU và error metric được gửi tới email dưới dạng notification.
+* **Pipeline + Ứng dụng đã triển khai:** Frontend và backend đang chạy chỉ được cập nhật qua đường tự động, không bao giờ bằng tay.
 
 ### Kết quả đạt được tuần 4:
 
-* Hiểu sâu hơn sự khác nhau giữa **object**, **block** và **file** storage trên AWS.
-* Sử dụng thành công **S3** để lưu trữ object và host static website.
-* Thực hành bảo vệ dữ liệu bằng **Versioning** và **Lifecycle Rules**.
-* Mount thành công **EFS** vào EC2 và hiểu cách shared storage phục vụ nhiều workload.
-* Chuẩn bị nền tảng storage quan trọng cho chủ đề private S3 access ở giai đoạn workshop sau này.
+* Xây dựng được CI/CD pipeline hoạt động thật, phủ source, build, test và deploy trên **CodeCommit**, **CodeBuild** và **CodePipeline**.
+* Đưa định nghĩa build vào repository dưới dạng `buildspec.yml` để quá trình build tái lập được và review được.
+* Hiểu cách artifact chảy giữa các stage của pipeline thông qua bucket **S3** thay vì build lại từ đầu.
+* Tạo dashboard **CloudWatch** riêng cùng alarm cho CPU và error, kết nối tới topic **SNS**.
+* Triển khai hoàn chỉnh ứng dụng frontend và backend qua pipeline và xác nhận ứng dụng trụ được qua một lần release tự động.
+* Liên kết pipeline trong lab với đường delivery dự kiến của LingoRise dùng **AWS SAM** và **Amplify Hosting**.
 
 ### Khó khăn gặp phải:
 
-* Hành vi truy cập của S3 ban đầu khá khó hiểu vì public access settings, bucket policy và object permissions cùng ảnh hưởng đến kết quả cuối cùng.
-* EFS đòi hỏi hiểu cả cấu hình phía AWS lẫn thao tác mount ở phía hệ điều hành trên EC2.
+* Những lần chạy pipeline đầu tiên fail vì quyền chứ không vì code, do CodeBuild service role không ghi được vào artifact bucket. Đọc log trên CloudWatch Logs nhanh hơn nhiều so với đoán policy.
+* Chọn ngưỡng cho alarm khó hơn việc tạo alarm. Ngưỡng quá chặt thì mỗi lần deploy đều báo động, quá lỏng thì sự cố thật lại bị bỏ qua.
 
 ### Bài học rút ra và định hướng tiếp theo:
 
-* Mỗi loại storage service giải quyết một bài toán khác nhau, và việc chọn đúng dịch vụ phụ thuộc vào access pattern của ứng dụng.
-* Ở tuần tiếp theo, tôi sẽ quay lại chủ đề **security và access control**, đặc biệt là IAM và thiết kế quyền truy cập giữa các dịch vụ AWS.
+* Tự động hóa chỉ hữu ích khi nó báo lỗi rõ ràng. Pipeline dừng lại ở một test fail và alarm đến được tay người chịu trách nhiệm là hai nửa của cùng một ý tưởng.
+* Giữ định nghĩa build và cấu hình triển khai trong repository giúp quy trình delivery được review như mọi thay đổi mã nguồn khác.
+* Ở tuần tiếp theo, tôi sẽ chuyển từ các lab riêng lẻ sang **khởi động dự án**: phân chia công việc trong nhóm, viết project proposal, vẽ sơ đồ kiến trúc hệ thống và dựng khung mã nguồn cùng infrastructure as code.

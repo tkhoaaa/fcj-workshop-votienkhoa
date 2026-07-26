@@ -5,94 +5,97 @@ weight: 7
 chapter: false
 pre: " <b> 1.7. </b> "
 ---
+
 ### Mục tiêu tuần 7:
 
-* Chuẩn bị môi trường workshop cho bài toán private access tới Amazon S3.
-* Hiểu kiến trúc và use case của **Gateway VPC Endpoint**.
-* Thực hành cấu hình network routing để truy cập S3 mà không đi qua Public Internet.
+* Thiết kế các entity cốt lõi của LingoRise cho courses, exams, questions, exam sessions và answers trên **Amazon RDS for PostgreSQL**.
+* Xây dựng repository layer trên `pg.Pool` singleton để các handler **AWS Lambda** không còn viết SQL trực tiếp.
+* Triển khai business logic cho exam engine, gồm tạo session và tính band score cho IELTS và TOEIC.
+* Dựng nền tảng frontend trên **Next.js (App Router)**: cấu trúc thư mục, routing, state management và UI Vietnamese-first.
 
 ### Các công việc cần triển khai trong tuần này:
 
 | Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Đọc workshop overview và vẽ lại kiến trúc mục tiêu cho private S3 connectivity. | 01/06/2026 | 01/06/2026 | [Workshop Overview](https://workshop-sample.fcjuni.com/5-workshop/5.1-workshop-overview/) |
-| **2** | Rà soát môi trường lab gồm VPC, subnets, route tables, EC2 instances và các tài nguyên hỗ trợ. | 02/06/2026 | 02/06/2026 | Ghi chú workshop |
-| **3** | Tạo **Gateway VPC Endpoint** cho Amazon S3 trong workshop VPC. | 03/06/2026 | 03/06/2026 | [Gateway Endpoint Lab](https://workshop-sample.fcjuni.com/5-workshop/5.3-lotushacks-utmorpho/5.3.1-from-zero-to-idea/) |
-| **4** | Kiểm tra cập nhật route table và xác nhận traffic S3 từ VPC đi qua endpoint. | 04/06/2026 | 04/06/2026 | [VPC Endpoints Docs](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html) |
-| **5** | Test truy cập bucket từ EC2 instance và lưu lại kết quả bằng screenshot cũng như output CLI. | 05/06/2026 | 05/06/2026 | [Test Gateway Endpoint](https://workshop-sample.fcjuni.com/5-workshop/5.3-lotushacks-utmorpho/5.3.2-building-under-pressure/) |
-| **6** | Tổng hợp khi nào nên dùng Gateway Endpoint và những giới hạn của nó so với Interface Endpoint. | 06/06/2026 | 06/06/2026 | Ghi chú cá nhân |
+| **1** | Thiết kế và migrate schema cốt lõi trên Amazon RDS for PostgreSQL: `courses`, `exams`, `exam_sections`, `questions`, `question_options` với UUID primary key và JSONB metadata. | 01/06/2026 | 01/06/2026 | [Amazon RDS for PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html) |
+| **2** | Thêm các bảng session `exam_sessions` và `session_answers`, sau đó dựng repository layer trên `pg.Pool` singleton dùng chung cho mọi Lambda handler. | 02/06/2026 | 02/06/2026 | Repository dự án |
+| **3** | Triển khai service cho exam engine: `POST /exams/start` tạo session từ bộ đề fixed đã tuyển chọn hoặc random pull từ question bank. | 03/06/2026 | 03/06/2026 | [AWS Lambda Node.js](https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html) |
+| **4** | Resolve asset URL của câu hỏi ngay tại service layer, chọn giữa public storage URL của **Amazon S3** và presigned URL hiệu lực 15 phút. | 04/06/2026 | 04/06/2026 | [S3 Presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html) |
+| **5** | Thiết lập cấu trúc Next.js App Router với route group cho learner và admin, React Query cho server state và các màn hình UI đầu tiên theo bản thiết kế. | 05/06/2026 | 05/06/2026 | [AWS Amplify Hosting](https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html) |
 
 ### Cách thực hiện chi tiết:
 
-#### 1. Bắt đầu từ kiến trúc workshop thay vì từng tài nguyên rời rạc
+#### 1. Thiết kế các entity cốt lõi trên Amazon RDS for PostgreSQL
 
-Tuần này tôi chuyển từ việc học từng dịch vụ riêng lẻ sang hiểu một kiến trúc có liên kết hoàn chỉnh. Mục tiêu không chỉ là “tạo một endpoint”, mà là cho phép **private S3 access từ workload trong VPC**.
+Tôi bắt đầu từ data model vì toàn bộ service trong tuần đều dựa vào nó. Trên **Amazon RDS for PostgreSQL**, tôi thêm các file migration idempotent cho `courses`, `exams`, `exam_sections`, `questions`, `question_options`, rồi tới phần session gồm `exam_sessions` và `session_answers`. Mỗi migration được ghi vào bảng `_migrations` nên chạy lại runner trên database `lingorise-dev` vẫn an toàn.
 
-Tôi rà lại toàn bộ đường đi:
+Có hai quyết định định hình cả tuần:
 
-* **EC2 instance trong VPC**
-* **Route table gắn với subnet**
-* **Gateway VPC Endpoint**
-* **Amazon S3**
+* **UUID primary key** để có thể trả session id về browser mà không lộ số lượng bản ghi.
+* Cột **JSONB metadata** trên `questions` và `exam_sessions`, nhờ đó đề Writing của IELTS và audio reference của TOEIC Part 3 mang cấu trúc khác nhau mà không cần đổi schema cho từng skill.
 
-Nhờ đó tôi hiểu rằng cấu hình endpoint thực chất là một bài toán tích hợp networking.
+```sql
+CREATE TABLE IF NOT EXISTS exam_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  exam_id UUID NOT NULL REFERENCES exams(id),
+  status TEXT NOT NULL DEFAULT 'in_progress',
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
 
-#### 2. Tạo Gateway VPC Endpoint cho S3
+#### 2. Dựng repository layer trên pg.Pool singleton
 
-Tôi mở VPC console và tạo **Gateway Endpoint** cho Amazon S3. Trong quá trình này, tôi chọn:
+Tuần trước, các API đầu tiên sau **Amazon API Gateway** truy vấn database ngay trong từng handler. Cách đó không mở rộng được, nên tôi tách ra repository layer: `courseRepository`, `examRepository`, `questionRepository` và `sessionRepository`. Tất cả repository dùng chung `pg.Pool` singleton được khởi tạo bên ngoài handler **AWS Lambda** và tái sử dụng qua các lần warm invocation.
 
-* đúng **VPC**
-* đúng **route table**
-* endpoint policy mặc định để test trước
+Chỉ repository biết tới SQL. Handler giờ chỉ còn phần plumbing: parse event, verify claims từ Cognito JWT, gọi service, định dạng response. Vì esbuild bundle từng function riêng, việc giữ pool trong một module dùng chung cũng giúp số connection tới instance `db.t4g.micro` luôn dự đoán được.
 
-Bước này thay đổi logic routing sao cho các request tới S3 từ subnet liên quan đi qua endpoint thay vì public Internet path.
+#### 3. Triển khai business logic cho exam engine
 
-#### 3. Test truy cập S3 từ EC2 trong VPC
+Service layer là nơi chứa phần lõi sản phẩm. `POST /exams/start` xác định người gọi từ token đã verify, kiểm tra xem có session in-progress để resume hay không, nếu không thì tạo session mới. Một exam có thể gắn với bộ đề fixed đã tuyển chọn, khi đó câu hỏi giữ đúng thứ tự định trước, hoặc được sinh ra bằng random pull từ question bank có filter theo skill, level và section.
 
-Từ EC2 instance trong VPC, tôi dùng AWS CLI để truy cập thử vào S3 bucket. Mục tiêu là xác minh đồng thời:
+Khi danh sách câu hỏi đã có, service resolve từng asset reference. Ảnh minh họa công khai dùng storage URL thẳng của **Amazon S3**; những asset cần bảo vệ như audio listening thì nhận presigned URL hiệu lực 15 phút, đủ dài cho một section nhưng đủ ngắn để link bị copy ra ngoài không còn giá trị.
 
-* hành vi network path
-* hành vi IAM permissions
+Phần scoring nằm cùng layer này: số câu đúng được map sang **Cambridge band** cho IELTS và scaled band cho TOEIC, nên frontend không bao giờ phải tự tính điểm.
 
-Điều này cho thấy mối liên kết rất rõ giữa các tuần:
+#### 4. Dựng nền tảng Next.js App Router
 
-* **Tuần 2:** VPC và route tables
-* **Tuần 5:** IAM roles và permissions
-* **Tuần 7:** S3 private access qua Gateway Endpoint
+Ở frontend, tôi thiết lập cấu trúc **Next.js** App Router mà **AWS Amplify Hosting** sẽ build. Tôi chia cây thư mục thành các route group: `(learner)` cho dashboard, trang course và exam runner, còn `(admin)` cho các màn hình content pipeline sẽ làm sau.
 
-#### 4. Quan sát rằng networking và permissions phải cùng đúng
+State management được chia rõ làm hai:
 
-Bài test chỉ thành công khi nhiều lớp cùng thỏa:
+* **React Query** giữ server state, nhờ đó danh sách course và metadata của exam được cache và revalidate thay vì fetch lại mỗi lần render.
+* **Local React state** giữ exam timer và answer sheet, vì chúng thay đổi từng giây và không được sinh network traffic.
 
-* EC2 phải có IAM access hợp lệ
-* subnet phải gắn đúng route table
-* Gateway Endpoint phải attach đúng
-* quyền truy cập tới S3 target phải được cho phép
-
-Đây là bài học quan trọng vì rất nhiều tích hợp AWS luôn là bài toán nhiều lớp chứ không phải chỉ một service.
+Sau đó tôi dựng các component UI Vietnamese-first đầu tiên theo bản thiết kế: course card, section navigator và answer sheet grid. Nhãn hiển thị bằng tiếng Việt, còn identifier kỹ thuật giữ tiếng Anh, giúp phần copy tự nhiên với người học mà không phải đổi tên field của API.
 
 ### Kết nối các dịch vụ AWS trong tuần này:
 
-* **EC2 + IAM Role:** Instance xác thực tới AWS services bằng temporary credentials.
-* **EC2 + VPC/Subnet/Route Table:** Network routing quyết định traffic rời instance như thế nào.
-* **Route Table + Gateway VPC Endpoint:** Traffic tới S3 được chuyển sang private AWS-managed path.
-* **Gateway Endpoint + S3:** Object storage có thể truy cập mà không cần public Internet routing.
-* **Workshop Architecture + Earlier Weeks:** Networking, identity và storage được kết nối lại trong cùng một bài lab.
+* **Lambda + RDS for PostgreSQL:** `pg.Pool` singleton nằm ngoài handler nên warm invocation tái sử dụng connection thay vì mở mới.
+* **Lambda + Amazon S3:** Exam service phát presigned URL 15 phút cho các question asset cần bảo vệ ngay khi start session.
+* **API Gateway + Lambda:** Các route của exam engine được expose qua REST API dựng từ tuần trước, handler chỉ còn là adapter mỏng trên service layer.
+* **Amazon Cognito + Lambda:** Claims trong JWT đã verify xác định learner nào đang được ghi session và answers.
+* **Amplify Hosting + API Gateway:** App Next.js được tổ chức để mọi query server state trỏ về một API base URL lấy từ environment của Amplify.
+* **CloudWatch Logs + Lambda:** Việc tạo session và scoring ghi một dòng log có cấu trúc cho mỗi request, giúp truy vết một band score sai rất nhanh.
 
 ### Kết quả đạt được tuần 7:
 
-* Hiểu rõ use case và lợi ích của **Gateway VPC Endpoints** cho Amazon S3.
-* Cấu hình thành công private S3 access từ workload trong VPC.
-* Kết nối được kiến thức networking với storage và IAM behavior trong một kiến trúc thực tế.
-* Tự tin hơn khi đọc workshop diagram và chuyển nó thành cấu hình AWS cụ thể.
-* Chuẩn bị nền tảng vững chắc cho hybrid access scenario ở tuần kế tiếp.
+* Migrate xong toàn bộ schema cốt lõi cho courses, exams, questions, sessions và answers vào database PostgreSQL `lingorise-dev`.
+* Thay SQL viết trực tiếp trong handler bằng repository layer dùng chung một `pg.Pool`.
+* Triển khai `POST /exams/start` với khả năng resume, chọn câu hỏi theo bộ fixed hoặc random, và resolve asset URL.
+* Triển khai Cambridge band scoring cho IELTS và scaled band scoring cho TOEIC tại một chỗ duy nhất.
+* Thiết lập layout Next.js App Router, route group và cấu hình React Query cho frontend.
+* Dựng các component UI Vietnamese-first đầu tiên trực tiếp từ bản thiết kế.
 
 ### Khó khăn gặp phải:
 
-* Việc chọn đúng route table cho lab đòi hỏi kiểm tra kỹ.
-* Không chỉ cần tạo endpoint, tôi còn phải xác minh rằng traffic path thực sự đã thay đổi như mong đợi.
+* Random question selection ban đầu trả về câu trùng giữa các section; tôi phải đưa logic loại trừ vào chính SQL query thay vì filter ở JavaScript.
+* Việc quyết định asset nào cần presigned URL đòi hỏi cân nhắc, vì sign tất cả sẽ làm trang tải chậm hơn mà không tăng thêm mức bảo vệ.
+* Giữ exam timer ở local state trong khi React Query refetch nền gây một bug re-render sớm làm reset đồng hồ đếm ngược.
 
 ### Bài học rút ra và định hướng tiếp theo:
 
-* Private connectivity trong AWS hầu như luôn là kết quả của việc tích hợp đúng giữa network design và access control.
-* Sang tuần tiếp theo, tôi sẽ mở rộng mô hình này sang **Interface Endpoints**, **DNS** và **on-premises simulation** để thực hành hybrid architecture.
+* Tách repository và service đáng giá dù thêm file: khi business logic rời khỏi handler, việc test một quy tắc scoring không còn cần gọi API.
+* Lưu phần khác biệt theo skill trong JSONB giúp schema ổn định trong lúc yêu cầu của IELTS và TOEIC còn thay đổi.
+* Tuần tới tôi sẽ nối hai nửa lại với nhau: kết nối frontend Next.js với backend REST API và triển khai authentication cùng authorization đầu cuối bằng **JWT** và **Amazon Cognito**.

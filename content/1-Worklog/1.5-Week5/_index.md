@@ -5,89 +5,105 @@ weight: 5
 chapter: false
 pre: "<b>1.5. </b>"
 ---
+
 ### Week 5 Objectives:
 
-* Strengthen my understanding of IAM, Roles, and AWS account security practices.
-* Learn how to apply least-privilege access for users, services, and EC2 instances.
-* Practice reviewing permissions from both the AWS Console and AWS CLI.
-* Prepare access control patterns that can be reused in the S3 workshop.
+* Kick off the capstone project with the team: split the work, agree on the idea, and write the Project Proposal.
+* Design the LingoRise system architecture diagram on AWS using a microservices-style decomposition.
+* Scaffold the source code repository for both the Next.js frontend and the Node.js Lambda backend.
+* Describe the whole infrastructure as code with AWS SAM so every environment can be rebuilt from one template.
 
 ### Tasks to be carried out this week:
 
 | Day | Task | Start Date | Completion Date | Reference Material |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Review IAM concepts including Users, Groups, Roles, and Policies. Compare managed policies and inline policies. | 18/05/2026 | 18/05/2026 | [AWS IAM Docs](https://docs.aws.amazon.com/iam/) |
-| **2** | Enable additional account security checks such as MFA review, password policy validation, and access key rotation awareness. | 19/05/2026 | 19/05/2026 | [AWS Security Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html) |
-| **3** | Create an IAM Role for EC2 and attach a limited S3 access policy. Test the role from an EC2 instance using AWS CLI. | 20/05/2026 | 20/05/2026 | [IAM Roles for Amazon EC2](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html) |
-| **4** | Write and validate a policy that only allows access to a specific S3 bucket and selected actions. | 21/05/2026 | 21/05/2026 | [IAM JSON Policy Reference](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html) |
-| **5** | Study governance concepts such as AWS Organizations and Service Control Policies at a conceptual level. | 22/05/2026 | 22/05/2026 | [AWS Organizations](https://docs.aws.amazon.com/organizations/) |
-| **6** | Summarize the week’s security lessons and document common mistakes that can lead to over-permissioned accounts. | 23/05/2026 | 23/05/2026 | Self-study notes |
+| **1** | Hold the team kickoff meeting, agree on the LingoRise idea, and split the work between frontend, backend, and infrastructure. | 18/05/2026 | 18/05/2026 | Team meeting notes |
+| **2** | Write the Project Proposal covering the problem statement, the serverless solution, the AWS service list, the monthly budget, and the main risks. | 19/05/2026 | 19/05/2026 | [AWS Pricing Calculator](https://calculator.aws/) |
+| **3** | Draw the system architecture diagram in Draw.io and Figma, from Amplify Hosting through API Gateway and Lambda down to RDS, S3, and SSM. | 20/05/2026 | 20/05/2026 | [AWS Architecture Icons](https://aws.amazon.com/architecture/icons/) |
+| **4** | Initialize the repository: Next.js App Router frontend, Node.js 20 Lambda handlers bundled with esbuild, shared database module. | 21/05/2026 | 21/05/2026 | Project repository |
+| **5** | Write the first `template.yaml` for AWS SAM, define the SSM parameter naming convention, and create the idempotent SQL migration files. | 22/05/2026 | 22/05/2026 | [AWS SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/) |
 
 ### Detailed Implementation:
 
-#### 1. Review access models before assigning permissions
+#### 1. Team kickoff and the LingoRise Project Proposal
 
-I revisited how access is granted in AWS by comparing:
+The team met on day one to agree on the capstone idea and split ownership. We chose **LingoRise**, a Vietnamese-first IELTS and TOEIC preparation platform, because the problem was easy to state and easy to test: practice material is scattered across many sources, feedback after a test is generic, and premium tiers are opaque about what the learner actually gets.
 
-* **IAM Users** for human identities
-* **IAM Groups** for permission grouping
-* **IAM Roles** for temporary delegated access
-* **Policies** as the permission language
+I took the infrastructure and backend scaffolding, one teammate took the Next.js frontend, and one took content and exam data modelling. The Project Proposal then documented the parts a reviewer would ask about:
 
-This was important because later weeks required services to access other services, not just a user clicking through the Console.
+* the problem statement and the target learner
+* the serverless solution and the AWS service list per layer
+* an estimated budget of roughly 30 to 40 USD per month, dominated by **Amazon RDS** and **AWS WAF**
+* risks such as content quality, exam scoring accuracy, and cost drift on the always-on database
 
-#### 2. Connect EC2 to AWS services without hardcoded credentials
+Writing the budget before writing code changed some design decisions. Choosing `db.t4g.micro` with 20 GB instead of a larger instance, and keeping WAF on a single API stage, were both proposal-level decisions rather than later cleanups.
 
-To practice secure service-to-service access, I created an **IAM Role** for EC2 and attached a policy that only allowed specific **S3 actions** on one bucket. Then I attached the role to an EC2 instance and tested access using AWS CLI from the instance itself.
+#### 2. System architecture diagram on AWS
 
-This created a secure integration path:
+I drew the architecture in Draw.io and refined the layout in Figma so the diagram could go straight into the proposal. The request path is a single line that is easy to explain:
 
-* **EC2 instance** -> assumes **IAM Role**
-* **IAM Role** -> has scoped **S3 permissions**
-* **AWS CLI on EC2** -> accesses **S3** using temporary credentials
+**Amplify Hosting** serves the Next.js App Router frontend, the browser calls **Amazon API Gateway** (REST), API Gateway invokes **AWS Lambda**, and Lambda reads and writes **Amazon RDS for PostgreSQL**, **Amazon S3**, and **AWS Systems Manager Parameter Store**. **Amazon Cognito** issues the JWT that Lambda verifies, and **Amazon CloudFront** fronts private assets with signed URLs.
 
-This was more secure than storing long-term access keys in the operating system.
+The microservices part of the design is a decomposition inside Lambda rather than a fleet of containers. I grouped handlers by domain: auth, exams, courses, admin, payments, and health. Each group has its own function and its own IAM role, so a payments bug cannot read speaking submissions in S3 and an exam handler cannot touch subscription tables it does not own. Everything runs in **ap-southeast-1** to keep latency low for Vietnamese learners.
 
-#### 3. Write policies around actual resources
+#### 3. Repository scaffolding for frontend and backend
 
-Instead of reading IAM policy syntax only theoretically, I wrote a policy with:
+I initialized the repository with a clear split between the Next.js App Router frontend and the backend handlers. Backend code is Node.js 20 bundled with esbuild, which keeps the deployment package small and cold starts short. A shared module owns the `pg.Pool` singleton so a warm Lambda container reuses its database connection instead of opening a new one per request.
 
-* specific **Action**
-* specific **Resource ARN**
-* limited access scope
+I also set the first migration convention. Migrations are plain SQL files, written to be safe to run twice, and applied rows are tracked in a `_migrations` table:
 
-Then I tested whether the instance could list, read, or upload objects depending on the permissions granted. This showed how IAM is directly connected to storage protection.
+```sql
+CREATE TABLE IF NOT EXISTS _migrations (
+  id          SERIAL PRIMARY KEY,
+  filename    TEXT NOT NULL UNIQUE,
+  applied_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
 
-#### 4. Relate IAM to future workshop use cases
+That table is small but it decides how the rest of the project ships database changes, so it went in before any feature table.
 
-This week’s security work connected strongly to later workshop tasks because private S3 access is not useful unless permissions are also correct. I noted that even if:
+#### 4. Infrastructure as code with AWS SAM
 
-* the network path works
-* the endpoint is configured correctly
+The last day went to `template.yaml`. **AWS SAM** describes the API, the Lambda functions, the S3 bucket, and the RDS instance, and deploys them as the single `lingorise-dev` CloudFormation stack. Nothing in the account is created by hand from the Console, so the stack can be torn down and rebuilt without losing the configuration.
 
-the request will still fail if the **IAM Role** or **S3 permissions** are incorrect.
+Secrets never appear in the template. I agreed on the naming convention `/lingorise/<stage>/...` in Parameter Store as SecureString, and the template resolves them at deploy time:
+
+```yaml
+Environment:
+  Variables:
+    DB_HOST: '{{resolve:ssm:/lingorise/${Stage}/db/host}}'
+    DB_PASSWORD: '{{resolve:ssm:/lingorise/${Stage}/db/password}}'
+    COGNITO_USER_POOL_ID: '{{resolve:ssm:/lingorise/${Stage}/cognito/user-pool-id}}'
+```
+
+The `Stage` parameter means the same template can produce a dev stack and, later, a production stack from the same source of truth.
 
 ### AWS Service Integration This Week:
 
-* **IAM User + Console/CLI:** Administrative actions were performed through controlled user credentials.
-* **EC2 + IAM Role:** The instance used a role instead of static access keys.
-* **IAM Policy + S3:** Permissions were scoped to specific bucket resources and actions.
-* **Governance Concepts + Account Security:** Policy thinking was expanded from one user or one service to an account-level perspective.
+* **Amplify Hosting + API Gateway:** the Next.js frontend calls the REST API over HTTPS instead of talking to any backend resource directly.
+* **API Gateway + Lambda:** each domain route group maps to its own Node.js 20 function, which is where the microservice boundary lives.
+* **Lambda + RDS for PostgreSQL:** handlers share a `pg.Pool` singleton so warm containers reuse connections against `db.t4g.micro`.
+* **Lambda + Systems Manager Parameter Store:** database and Cognito configuration is resolved from SecureString parameters at deploy time, never committed.
+* **Cognito + Lambda:** the user pool issues the JWT and the handler verifies it before any query runs.
+* **AWS SAM + CloudFormation:** the whole architecture diagram is expressed as one template that builds the `lingorise-dev` stack.
 
 ### Week 5 Achievements:
 
-* Understood the practical difference between **Users**, **Groups**, **Roles**, and **Policies**.
-* Successfully attached an **IAM Role** to EC2 and tested AWS service access without static credentials.
-* Improved policy-writing confidence by connecting permissions to a real S3 use case.
-* Developed a stronger least-privilege mindset for service access design.
-* Prepared the permission model needed for later VPC Endpoint and S3 workshop tasks.
+* Agreed on the LingoRise idea with the team and produced a signed-off Project Proposal with scope, AWS services, budget, and risks.
+* Completed the system architecture diagram in Draw.io and Figma, with a per-domain Lambda decomposition and one IAM role per domain.
+* Scaffolded the repository: Next.js App Router frontend, esbuild-bundled Node.js 20 handlers, and a shared database module.
+* Wrote the first `template.yaml` for AWS SAM and deployed the initial `lingorise-dev` stack in `ap-southeast-1`.
+* Established the `_migrations` table and the idempotent SQL migration workflow.
+* Fixed the `/lingorise/<stage>/...` SSM naming convention so no secret is stored in the repository.
 
 ### Challenges Faced:
 
-* IAM policy syntax was still detailed and unforgiving, especially when matching actions and resource ARNs.
-* It took careful testing to distinguish between access failures caused by IAM and those caused by other factors.
+* Deciding how far to split the Lambda functions took discussion. Too many functions meant duplicated bundling and more cold starts, too few meant IAM roles that were wider than the domain they served.
+* The budget estimate was hard to pin down because RDS runs continuously while Lambda and API Gateway costs depend on traffic we could not predict yet.
+* Getting SAM to deploy cleanly the first time required several template fixes, mostly around resource dependencies and parameter resolution order.
 
 ### Lessons Learned and Next Steps:
 
-* Secure service integration in AWS depends on both identity design and correct resource permissions.
-* In the following week, I would extend this work by focusing on **CloudWatch** and **CloudTrail** so I could observe system behavior and detect access or performance issues more effectively.
+* Writing the proposal and drawing the architecture before coding removed a lot of later rework, because sizing and cost decisions were already settled.
+* Infrastructure as code is worth the extra day at the start. Once `template.yaml` existed, every following change became a reviewable diff instead of a Console click nobody remembers.
+* In the following week, I would start coding the core features on top of this scaffolding: user management, **Cognito** authentication and authorization, the data-processing services, and the first APIs exposed through **API Gateway** with CORS configured for the Amplify frontend.

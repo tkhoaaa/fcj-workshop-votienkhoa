@@ -7,27 +7,27 @@ pre: "<b>1. </b>"
 ---
 
 {{% notice info %}}
-**Introduction:** This page summarizes my entire 12-week internship process at the **Workforce Bootcamp - First Cloud AI Journey (FCAJ)** program. The roadmap is built starting from AWS fundamentals, networking, compute, storage, security, monitoring to an in-depth workshop on **private/hybrid access to Amazon S3**, then completed with documentation, knowledge sharing, and an internship report.
+**Introduction:** This page summarizes my entire 12-week internship process at the **Workforce Bootcamp - First Cloud AI Journey (FCAJ)** program. The roadmap starts from AWS fundamentals — compute, networking, database, security, DevOps and monitoring — then moves into building and deploying the **LingoRise** serverless platform on AWS, and closes with testing, user feedback, documentation and the final internship report.
 {{% /notice %}}
 
 ### 12-Week Roadmap Overview
 
-Throughout the internship, I not only learned each AWS service individually but also step-by-step connected them into complete architectures. This roadmap helped me better understand how components like **IAM**, **VPC**, **EC2**, **EBS**, **S3**, **EFS**, **CloudWatch**, **CloudTrail**, **Route 53**, and **VPC Endpoints** coordinate with each other in practice.
+The internship was split into two clear halves. In the first four weeks I studied AWS services individually and practiced them through hands-on labs. From Week 5 onward, I applied that foundation to a real product — **LingoRise**, an IELTS/TOEIC preparation platform — going through proposal, architecture design, development, integration, testing, user feedback, and final handover.
 
 | Week | Main Topic | Task Summary |
 | :--- | :--- | :--- |
-| **Week 1** | [Kick-off, account security, and environment setup](1.1-week1/) | Getting started with AWS, securing account with MFA and IAM, installing AWS CLI, launching the first EC2 instance. |
-| **Week 2** | [Networking with VPC, Subnet, and Route Table](1.2-week2/) | Designing custom VPC, dividing public/private subnets, configuring IGW, NAT Gateway, Security Groups, and NACL. |
-| **Week 3** | [Compute with EC2, Linux, and EBS](1.3-week3/) | Configuring EC2 instance, installing Nginx, attaching and expanding EBS volume, creating AMI for reuse. |
-| **Week 4** | [Storage with S3 and EFS](1.4-week4/) | Creating S3 bucket, enabling versioning and lifecycle rules, hosting static website, and mounting EFS to EC2. |
-| **Week 5** | [IAM, Roles, and Security Governance](1.5-week5/) | Designing least-privilege access, attaching IAM Role to EC2, testing S3 access without static credentials. |
-| **Week 6** | [CloudWatch, CloudTrail, and System Observability](1.6-week6/) | Setting up metrics, alarms, logs, and audit trails to monitor the status of the deployed infrastructure. |
-| **Week 7** | [Gateway VPC Endpoint for Amazon S3](1.7-week7/) | Practicing the workshop for private S3 access from a workload in VPC via Gateway Endpoint and route tables. |
-| **Week 8** | [Interface Endpoint, Route 53, and Hybrid Connectivity](1.8-week8/) | Simulating S3 access from an on-premises environment, configuring Interface Endpoint and DNS resolution with Route 53. |
-| **Week 9** | [VPC Endpoint Policies and Multi-layer Security](1.9-week9/) | Restricting S3 access using endpoint policy, bucket policy, and IAM policy, along with building a troubleshooting checklist. |
-| **Week 10** | [Automation, documentation, and cost awareness](1.10-week10/) | Summarizing AWS CLI commands, creating helper scripts, reviewing costs, and standardizing workshop documentation. |
-| **Week 11** | [Knowledge sharing and report drafting](1.11-week11/) | Converting technical parts into understandable content, drafting worklog/report, and preparing sharing materials. |
-| **Week 12** | [Final review, self-evaluation, and internship wrap-up](1.12-week12/) | Reviewing the entire 12 weeks, finalizing the report, cleaning up lab resources, and determining next learning directions. |
+| **Week 1** | [AWS fundamentals: EC2, VPC, and DRS](1.1-week1/) | Studying EC2, VPC and Elastic Disaster Recovery, completing basic labs, trial SAM deployment with secrets in Systems Manager Parameter Store. |
+| **Week 2** | [VPC deep dive, AWS databases, and IAM](1.2-week2/) | Working through Subnets, Route Tables, IGW, NAT Gateway and NACLs; comparing Amazon RDS with DynamoDB; managing Users, Groups, Roles and Policies in IAM. |
+| **Week 3** | [Workload on EC2, Nginx, S3 events, and AMI](1.3-week3/) | Reusing the VPC to run a workload, installing Nginx on Amazon Linux, triggering Lambda from S3 Event Notifications, creating an AMI for backup and repeated deployment. |
+| **Week 4** | [DevOps on AWS: CI/CD and CloudWatch](1.4-week4/) | Studying CodeCommit, CodeBuild and CodePipeline, building a CI/CD pipeline, setting up CloudWatch dashboards and alarms, deploying a full web application automatically. |
+| **Week 5** | [Project proposal and architecture design](1.5-week5/) | Team kick-off and task split, writing the LingoRise Project Proposal, designing the system architecture diagram, initializing the source code and infrastructure as code. |
+| **Week 6** | [Core features, authentication, and API layer](1.6-week6/) | Coding user management and authorization with Cognito, developing the data-processing services, building the APIs between Frontend and Backend with CORS and API Gateway. |
+| **Week 7** | [Backend services and Frontend foundation](1.7-week7/) | Building core services, entities, repositories and business logic on the Backend; setting up project structure, routing, state management and UI on the Frontend. |
+| **Week 8** | [Frontend-Backend integration and security](1.8-week8/) | Connecting the Frontend to the Backend through the RESTful API, rendering real data, implementing authentication and authorization with JWT and Amazon Cognito. |
+| **Week 9** | [Testing, bug fixing, and AI optimization](1.9-week9/) | Running functional and integration testing across Frontend, Backend and AWS services, fixing outstanding bugs, and tuning the AI processing flow for speed and accuracy. |
+| **Week 10** | [Handover, cost cleanup, and final report](1.10-week10/) | Packaging the whole source code on GitHub, cleaning up unused AWS resources and setting cost limits, completing the Final Internship Report in English. |
+| **Week 11** | [User feedback analysis and product refinement](1.11-week11/) | Collecting and analyzing user experience metrics and error rates from real testing, then refining the React frontend and fixing unexpected issues. |
+| **Week 12** | [Final bug fixing, workshop report, and packaging](1.12-week12/) | Prioritizing and closing the remaining technical bugs, writing the Final Workshop Report with user evaluation data, and packaging the complete internship documentation. |
 
 ---
 
@@ -44,9 +44,9 @@ I pursued the **Learning by Doing** method and maintained the worklog structure 
 3. **Observing connections between services**
    Each week, I didn't just record "what was created," but also paid attention to:
    * which service connects to which service
-   * how the network path goes
-   * how IAM permissions affect
-   * which DNS, route table, or policy determines the final outcome
+   * how a request travels from the browser to the database
+   * how IAM permissions and Cognito tokens affect access
+   * which configuration — network, policy, or environment variable — determines the final outcome
 
 4. **Logging and Reflection**
    I updated the worklog weekly to record:
@@ -63,15 +63,18 @@ I pursued the **Learning by Doing** method and maintained the worklog structure 
 
 Over 12 weeks, the service groups I used and connected the most include:
 
-* **Identity and Security:** IAM Users, Roles, Policies, MFA
+* **Identity and Security:** IAM Users, Roles, Policies, MFA, Amazon Cognito
 * **Networking:** VPC, Subnets, Route Tables, Internet Gateway, NAT Gateway, Security Groups, NACLs
-* **Compute:** Amazon EC2
-* **Storage:** Amazon EBS, Amazon S3, Amazon EFS
+* **Compute:** Amazon EC2, AWS Lambda (Node.js 20)
+* **Application delivery:** Amazon API Gateway, AWS SAM, AWS Amplify Hosting
+* **Database:** Amazon RDS for PostgreSQL, Amazon DynamoDB
+* **Storage and Content Delivery:** Amazon S3, Amazon EBS, Amazon CloudFront
 * **Observability:** Amazon CloudWatch, AWS CloudTrail
-* **Hybrid/Private Access:** Gateway VPC Endpoint, Interface VPC Endpoint, Route 53
+* **Configuration and Security:** AWS Systems Manager Parameter Store, AWS WAF
+* **DevOps:** AWS CodeCommit, CodeBuild, CodePipeline
 * **Governance and Cost Awareness:** AWS Budgets, Billing, Cost Explorer
 
-These services are not learned in isolation, but are gradually connected into a complete chain serving the practical problem of **private access to Amazon S3** in cloud and hybrid environments.
+These services are not learned in isolation. They are gradually connected into a complete chain serving one practical goal: building and shipping **LingoRise**, a serverless IELTS/TOEIC preparation platform, on AWS.
 
 ---
 
@@ -80,8 +83,8 @@ These services are not learned in isolation, but are gradually connected into a 
 This worklog section is not only used to list the tasks I have completed during the internship, but also aims to demonstrate:
 
 * My process of learning and applying AWS step by step
-* How I connect AWS services into real architectures
-* My troubleshooting mindset, security, and cost awareness during lab exercises
-* My development in technical skills, self-learning ability, and presentation skills
+* How I connect AWS services into a real product architecture
+* My troubleshooting mindset, security, and cost awareness during labs and project work
+* My development in technical skills, teamwork, self-learning ability, and presentation skills
 
-Through the 12-week worklog, I wish to clearly demonstrate the journey from an AWS beginner to being able to understand, deploy, explain, and summarize a cloud architecture with many interconnected components.
+Through the 12-week worklog, I wish to clearly demonstrate the journey from an AWS beginner to being able to understand, deploy, explain, and hand over a complete serverless product built from many interconnected AWS components.

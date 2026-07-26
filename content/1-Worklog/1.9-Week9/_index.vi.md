@@ -5,94 +5,101 @@ weight: 9
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
+
 ### Mục tiêu tuần 9:
 
-* Tìm hiểu cách giới hạn truy cập dịch vụ bằng **VPC Endpoint Policies**.
-* Củng cố kỹ năng troubleshooting cho mô hình private Amazon S3 connectivity.
-* Tổng hợp phần kiến thức kỹ thuật cốt lõi của workshop.
+* Kiểm thử chức năng toàn bộ luồng người học của LingoRise và các luồng quản trị nội dung.
+* Kiểm thử tích hợp tại các ranh giới dịch vụ thực tế: **API Gateway**, **AWS Lambda**, **Amazon RDS**, **Amazon S3**, **AWS Systems Manager** và **Amazon Cognito**.
+* Sửa các lỗi tồn đọng phát hiện trong quá trình kiểm thử, không chỉ ghi nhận lại.
+* Tối ưu hóa luồng xử lý AI và OCR về tốc độ trích xuất, độ chính xác và khả năng chịu lỗi.
 
 ### Các công việc cần triển khai trong tuần này:
 
 | Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Ôn lại cách IAM policies, S3 bucket policies và VPC Endpoint Policies kết hợp với nhau. | 15/06/2026 | 15/06/2026 | [Endpoint Policy Docs](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html) |
-| **2** | Cấu hình S3 VPC Endpoint Policy để giới hạn truy cập vào bucket hoặc phạm vi action cụ thể. | 16/06/2026 | 16/06/2026 | [Workshop Policy Section](https://workshop-sample.fcjuni.com/5-workshop/5.5-policy/) |
-| **3** | Kiểm tra cả trường hợp truy cập thành công và bị từ chối bằng AWS CLI từ lab EC2 instance. | 17/06/2026 | 17/06/2026 | AWS CLI |
-| **4** | Tạo checklist troubleshooting bao gồm route tables, security groups, DNS, IAM, bucket policy và endpoint policy. | 18/06/2026 | 18/06/2026 | Ghi chú cá nhân |
-| **5** | Viết nháp một technical note hoặc blog outline tóm tắt workshop và các bài học bảo mật. | 19/06/2026 | 19/06/2026 | Bản nháp cá nhân |
-| **6** | Rà soát và sắp xếp screenshot, policy snippets và command outputs để phục vụ báo cáo. | 20/06/2026 | 20/06/2026 | Ghi chú chuẩn bị báo cáo |
+| **1** | Viết test plan chức năng cho luồng người học (sign-in, catalog, start exam, answer, submit, score, review) và chạy trên API stage `lingorise-dev`. | 15/06/2026 | 15/06/2026 | Repository dự án |
+| **2** | Kiểm thử chức năng các luồng quản trị nội dung: import DOCX và PDF, duplicate detection, review queue, publish và audit log. | 16/06/2026 | 16/06/2026 | Ghi chú tự học |
+| **3** | Kiểm thử tích hợp end-to-end tại các ranh giới dịch vụ và dùng **Amazon CloudWatch Logs** để truy vết lỗi xảy ra bên trong Lambda. | 17/06/2026 | 17/06/2026 | [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) |
+| **4** | Sửa các lỗi phát hiện trong ba ngày trước và chạy lại những test case liên quan sau mỗi lần `sam deploy`. | 18/06/2026 | 18/06/2026 | [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli.html) |
+| **5** | Tinh chỉnh OCR job queue và độ chính xác của Tesseract.js, sau đó kiểm tra luồng fallback từ AI provider nội bộ sang OpenRouter. | 19/06/2026 | 19/06/2026 | [AWS Lambda Docs](https://docs.aws.amazon.com/lambda/) |
 
 ### Cách thực hiện chi tiết:
 
-#### 1. Hiểu cơ chế kiểm soát quyền ở nhiều lớp
+#### 1. Kiểm thử chức năng luồng người học và luồng quản trị
 
-Tuần này tập trung vào việc ngay cả khi kết nối mạng đã đúng, truy cập dịch vụ vẫn có thể bị giới hạn có chủ đích. Tôi xem lại cách:
+Tôi kiểm thử luồng người học đúng theo cách một người dùng thật sẽ đi: đăng nhập qua **Amazon Cognito**, xem catalog đề thi, bắt đầu một session IELTS, trả lời câu hỏi, submit, nhận band score và mở phần review từng câu kèm giải thích và transcript phần listening. Trường hợp tôi kiểm tra lại nhiều nhất là session resume, vì người học đóng tab rồi quay lại phải nhận đúng bản ghi `exam_sessions` cũ, không phải một lượt thi mới.
 
-* **IAM policies**
-* **S3 bucket policies**
-* **VPC Endpoint Policies**
+Ở phía quản trị, tôi import một file DOCX thật và một scanned PDF, rồi kiểm tra duplicate detection có phát hiện câu hỏi tôi cố tình import hai lần, review queue có giữ draft lại thay vì publish trực tiếp, và mọi hành động publish đều được ghi vào bảng audit log.
 
-cùng ảnh hưởng đến một request nhưng theo các vai trò khác nhau.
+Thói quen quan trọng ở đây là viết kết quả mong đợi trước khi chạy test. Nếu không, một band score sai vẫn trông hợp lý và sẽ đi qua mà không ai để ý.
 
-Thay vì xem access control là một luật đơn giản, tôi tiếp cận nó như một mô hình đánh giá nhiều lớp.
+#### 2. Kiểm thử tích hợp tại các ranh giới dịch vụ thực tế
 
-#### 2. Giới hạn truy cập ngay tại endpoint
+Test local chỉ chứng minh được phần logic của handler. Các ranh giới phải được kiểm thử trên hạ tầng đã deploy, nên tôi chạy các case trực tiếp trên stack `lingorise-dev`:
 
-Tôi cấu hình **VPC Endpoint Policy** để chỉ cho phép truy cập đến một S3 bucket cụ thể hoặc một số action nhất định. Điều này có nghĩa là dù instance có quyền rộng hơn ở nơi khác, chính endpoint path vẫn có thể đóng vai trò như một lớp lọc bổ sung.
+* **API Gateway -> Lambda:** request mapping, kích thước payload và CORS preflight cho origin trên Amplify.
+* **Lambda -> Amazon RDS:** việc tái sử dụng `pg.Pool` giữa các warm invocation và hành vi khi cold start tạo pool mới.
+* **Lambda -> Amazon S3:** sinh presigned URL, thời gian hết hạn và upload trực tiếp từ browser lên bucket.
+* **Lambda -> AWS Systems Manager:** các parameter SecureString được resolve lúc deploy qua `{{resolve:ssm:/lingorise/dev/...}}`.
+* **Amazon Cognito -> Lambda:** xác thực JWT bằng `aws-jwt-verify`, gồm cả token đã hết hạn và token từ user pool khác.
 
-Luồng tích hợp nâng cao lúc này là:
+Có hai thứ không thể tái hiện được ở local: chữ ký presigned URL dưới IAM role đã deploy, và việc verify JWT với JWKS endpoint thật. Cả hai chỉ lỗi trên AWS và chỉ chẩn đoán được từ **Amazon CloudWatch Logs**. Tôi bỏ hẳn thói quen đoán nguyên nhân khi Lambda lỗi và chuyển sang đọc log stream trước.
 
-* **EC2 với IAM Role**
-* **private network path qua endpoint**
-* **endpoint policy check**
-* **S3 bucket policy check**
-* **quyết định truy cập cuối cùng**
+#### 3. Các lỗi phát hiện và đã sửa
 
-#### 3. Kiểm tra allowed và denied bằng AWS CLI
+Ba lỗi tiêu biểu cho cả tuần:
 
-Tôi dùng AWS CLI từ EC2 instance để kiểm tra:
+* Submit lại một session đã submit tạo thêm một dòng score thứ hai. Cách sửa là dùng conditional update theo trạng thái session để chỉ ghi khi session còn đang mở.
+* Việc quy đổi scaled band của TOEIC làm tròn sai ở biên, nên một raw score đúng ngay điểm biên bị tụt một band. Tôi sửa ở phần tra bảng quy đổi và thêm các giá trị biên thành test case tường minh.
+* Một số lần cold start lỗi kết nối vì RDS pool được tạo trước khi credentials từ SSM được đọc. Sắp lại thứ tự khởi tạo là hết.
 
-* các lệnh được phép
-* các lệnh bị từ chối
-* các failure case đúng như kỳ vọng
+```bash
+sam build && sam deploy --stack-name lingorise-dev --no-confirm-changeset
+aws logs tail /aws/lambda/lingorise-dev-api --since 10m --follow
+```
 
-Điều này rất có ích vì nó biến kiến thức về policy từ lý thuyết thành hành vi có thể quan sát được.
+#### 4. Tối ưu hóa luồng xử lý AI và OCR
 
-#### 4. Xây dựng quy trình troubleshooting có thể lặp lại
+Luồng OCR là một job queue theo từng asset trong PostgreSQL, được một worker theo lịch drain bằng cách claim dòng với `FOR UPDATE SKIP LOCKED`. Kiểm thử cho thấy worker chỉ claim một job mỗi lần chạy, nên một scanned PDF 30 trang mất quá nhiều thời gian. Tôi tăng batch size khi claim và để worker tiếp tục drain khi vẫn còn thời gian trong lần invocation.
 
-Đến cuối tuần, tôi đã có một checklist bắt đầu từ:
+```sql
+SELECT id, asset_key FROM ocr_jobs
+WHERE status = 'pending'
+ORDER BY created_at
+FOR UPDATE SKIP LOCKED
+LIMIT 5;
+```
 
-* network path
-* DNS behavior
-* endpoint status
-* IAM role permissions
-* S3 bucket policy
-* endpoint policy
+Về độ chính xác, tôi rasterize trang ở DPI cao hơn trước khi đưa vào **Tesseract.js**, load đồng thời language data tiếng Việt và tiếng Anh, đồng thời thêm bước preprocessing grayscale và tăng contrast. Nhờ vậy lượng chỉnh sửa tay trong review queue giảm rõ rệt với tài liệu scan.
 
-Nhờ vậy việc troubleshooting trở nên có phương pháp hơn và giảm bớt sự rối khi request thất bại.
+Về khả năng chịu lỗi, tôi kiểm tra luồng fallback của AI provider: khi provider nội bộ không truy cập được, request sẽ chuyển sang OpenRouter thay vì trả lỗi. Tôi cố tình trỏ provider vào một endpoint đã chết và xác nhận request vẫn hoàn tất, với lần fallback được ghi vào log để có thể nhìn lại sau.
 
 ### Kết nối các dịch vụ AWS trong tuần này:
 
-* **IAM Role + EC2:** Danh tính của workload quyết định instance được phép yêu cầu gì.
-* **EC2 + VPC Endpoint:** Mọi lưu lượng tới S3 đi theo private path có kiểm soát.
-* **VPC Endpoint Policy + S3 Bucket Policy:** Truy cập được lọc ở cả network-entry layer và storage-resource layer.
-* **AWS CLI + Policy Testing:** Dòng lệnh được dùng để kiểm tra end-to-end security behavior.
-* **Workshop Architecture + Governance:** Kiến trúc đang hoạt động được bổ sung thêm lớp security control.
+* **API Gateway + AWS Lambda:** Mọi test case chức năng đều đi qua REST stage nên request mapping và CORS được kiểm thử thật, không bị bỏ qua.
+* **AWS Lambda + Amazon RDS:** Kiểm thử tích hợp xác nhận `pg.Pool` singleton tồn tại qua các warm invocation và khởi tạo đúng khi cold start.
+* **AWS Lambda + Amazon S3:** Upload và download qua presigned URL được kiểm thử với execution role đã deploy, nơi duy nhất chữ ký là thật.
+* **Amazon Cognito + AWS Lambda:** Việc verify JWT được kiểm thử với token hợp lệ, token hết hạn và token sai user pool để chắc chắn authorizer từ chối thay vì mặc định cho qua.
+* **AWS Lambda + AWS Systems Manager:** SecureString trong Parameter Store được resolve lúc deploy, và chính điều đó làm lộ ra lỗi thứ tự khởi tạo gây lỗi cold start.
+* **Amazon CloudWatch Logs + AWS SAM:** Sau mỗi `sam deploy` tôi tail log ngay, biến một lỗi HTTP 500 mơ hồ thành stack trace cụ thể.
 
 ### Kết quả đạt được tuần 9:
 
-* Hiểu cách **VPC Endpoint Policies** thêm một lớp kiểm soát cho private service access.
-* Có trải nghiệm thực tế với cả trường hợp thành công lẫn bị từ chối khi thao tác với S3.
-* Xây dựng mô hình tư duy rõ ràng hơn về policy evaluation giữa nhiều dịch vụ AWS.
-* Tạo được phương pháp troubleshooting có thể tái sử dụng ở các bài lab khác.
-* Làm sâu thêm phần bảo mật của workshop thay vì chỉ dừng ở connectivity.
+* Thực thi một test plan chức năng đã viết trước cho luồng người học và luồng nội dung quản trị, gồm cả exam session resume.
+* Hoàn thành kiểm thử tích hợp trên stack `lingorise-dev` đã deploy ở cả năm ranh giới dịch vụ.
+* Sửa lỗi trùng dòng score, lỗi làm tròn biên band TOEIC và lỗi khởi tạo pool khi cold start, rồi kiểm chứng lại bằng chính case đã fail.
+* Tăng throughput OCR bằng cách claim job theo batch trong worker `FOR UPDATE SKIP LOCKED` thay vì xử lý một asset mỗi lần chạy.
+* Cải thiện độ chính xác OCR nhờ tăng chất lượng rasterize trang, dùng đồng thời language data tiếng Việt và tiếng Anh, và preprocessing ảnh.
+* Kiểm chứng luồng fallback của AI provider để khi provider gặp sự cố thì chất lượng phản hồi giảm chứ không làm chết request.
 
 ### Khó khăn gặp phải:
 
-* Đôi khi khá khó xác định lớp policy nào là nguyên nhân gây lỗi.
-* Việc khớp chính xác ARN và action đòi hỏi cẩn thận để tránh ra kết quả ngoài ý muốn.
+* Nhiều lỗi chỉ xuất hiện trên AWS, nên bộ test local tạo cảm giác an toàn sai và CloudWatch Logs mới là nơi debug thật sự.
+* Tinh chỉnh độ chính xác OCR không có một cấu hình đúng duy nhất; DPI rasterize cao hơn giúp nhận diện tốt hơn nhưng tốn thời gian xử lý, nên batch size phải cân với timeout của worker.
+* Tái hiện chủ động một Cognito token hết hạn và một sự cố provider đòi hỏi phải cố tình làm sai cấu hình, việc này mất thời gian hơn tưởng.
 
 ### Bài học rút ra và định hướng tiếp theo:
 
-* Một thiết kế AWS an toàn không chỉ là cho phép kết nối mà còn là giới hạn truy cập ở đúng control points.
-* Sang tuần tiếp theo, tôi sẽ tập trung vào **documentation**, **automation** và **cost awareness** để workshop dễ bảo trì và trình bày chuyên nghiệp hơn.
+* Một test chỉ hữu ích khi kết quả mong đợi được viết ra trước khi chạy. Output sai nhưng trông hợp lý là kiểu lỗi sống sót qua kiểm thử.
+* Ranh giới giữa các dịch vụ là nơi lỗi thật nằm. Unit test của handler vẫn pass trong khi presigned URL và verify JWT đều đang lỗi.
+* Sang tuần tiếp theo tôi chuyển sang bàn giao và đóng gói: đưa source code lên GitHub, dọn dẹp cùng giới hạn tài nguyên AWS để tối ưu chi phí, và viết báo cáo thực tập cuối kỳ bằng tiếng Anh.

@@ -5,81 +5,97 @@ weight: 6
 chapter: false
 pre: "<b>1.6. </b>"
 ---
+
 ### Week 6 Objectives:
 
-* Improve system observability using Amazon CloudWatch and AWS CloudTrail.
-* Learn how to monitor EC2 instances, create alarms, and review AWS API activity.
-* Develop an operational mindset for detecting and troubleshooting issues earlier.
+* Start coding the core features of LingoRise on top of last week's SAM scaffolding.
+* Build user management with an **Amazon Cognito** user pool and a mirrored `users` table in **Amazon RDS**.
+* Implement role-based authorization in the handlers and least-privilege **IAM** execution roles for each Lambda.
+* Expose the first APIs through **Amazon API Gateway** with a working CORS configuration for the Amplify frontend.
 
 ### Tasks to be carried out this week:
 
 | Day | Task | Start Date | Completion Date | Reference Material |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Study the main components of Amazon CloudWatch: Metrics, Logs, Dashboards, and Alarms. | 25/05/2026 | 25/05/2026 | [Amazon CloudWatch Docs](https://docs.aws.amazon.com/cloudwatch/) |
-| **2** | Create CloudWatch Alarms for EC2 metrics such as CPU utilization and instance status checks. | 26/05/2026 | 26/05/2026 | [Using Amazon CloudWatch Alarms](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html) |
-| **3** | Install or review CloudWatch Agent configuration to forward additional logs and metrics from EC2. | 27/05/2026 | 27/05/2026 | [CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html) |
-| **4** | Explore AWS CloudTrail and review event history for actions performed during previous lab exercises. | 28/05/2026 | 28/05/2026 | [AWS CloudTrail Docs](https://docs.aws.amazon.com/cloudtrail/) |
-| **5** | Create a small monitoring checklist for EC2-based workloads, including health, access, and performance signals. | 29/05/2026 | 29/05/2026 | Self-study notes |
-| **6** | Write a short operations note describing how logs and alarms help reduce troubleshooting time. | 30/05/2026 | 30/05/2026 | Self-study notes |
+| **1** | Create the Cognito user pool and app client for `lingorise-dev`, then test the sign-up, confirm, and sign-in flow. | 25/05/2026 | 25/05/2026 | [Amazon Cognito User Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html) |
+| **2** | Add the `users` migration in RDS mirroring the Cognito subject, and write the handler that provisions a local user row on first authenticated request. | 26/05/2026 | 26/05/2026 | [Amazon RDS for PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html) |
+| **3** | Implement role checks for learner, content manager, and admin, and tighten each Lambda IAM execution role to the resources it actually uses. | 27/05/2026 | 27/05/2026 | [IAM Least Privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html) |
+| **4** | Write the first data-processing handlers that read and write course and question-bank records through the `pg.Pool` singleton. | 28/05/2026 | 28/05/2026 | Project repository |
+| **5** | Map REST resources and methods to Lambda in API Gateway, deploy the `dev` stage, and configure CORS for the Amplify domain. | 29/05/2026 | 29/05/2026 | [API Gateway CORS](https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html) |
 
 ### Detailed Implementation:
 
-#### 1. Add monitoring to the EC2 workload from previous weeks
+#### 1. User management split between Cognito and the database
 
-I reused the EC2-based environment built in earlier weeks and connected it to **CloudWatch**. Instead of treating the server as a black box, I monitored:
+I created the **Amazon Cognito** user pool for `lingorise-dev` with email as the sign-in alias, then an app client without a secret so the **Next.js** frontend can call it directly from the browser. I walked the full flow manually first: sign-up, confirmation code by email, sign-in, and inspection of the returned ID token.
 
-* CPU utilization
-* status checks
-* basic health signals
+Cognito gives me a stable subject (`sub`) but it is not a good place to keep application state. So I added a `users` table in **Amazon RDS for PostgreSQL** that mirrors that subject and carries everything the product needs:
 
-This was the first step in turning a simple instance into a manageable cloud workload.
+```sql
+CREATE TABLE IF NOT EXISTS users (
+  id            BIGSERIAL PRIMARY KEY,
+  cognito_sub   TEXT UNIQUE NOT NULL,
+  email         TEXT NOT NULL,
+  display_name  TEXT,
+  role          TEXT NOT NULL DEFAULT 'learner',
+  is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
 
-#### 2. Connect EC2 logs and metrics to CloudWatch
+The division of responsibility is the point: Cognito owns identity and credentials, the database owns role, active flag, profile, and later the subscription link. A shared `ensureUser` helper runs on the first authenticated request and inserts the row idempotently, so a Cognito user always has exactly one local counterpart.
 
-By reviewing or installing **CloudWatch Agent**, I learned how operating system-level data can be pushed from **EC2** into **CloudWatch Logs** and **CloudWatch Metrics**. This created a useful operations flow:
+#### 2. Authorization: role checks in code, least privilege in IAM
 
-* **EC2 operating system**
-* **CloudWatch Agent**
-* **CloudWatch Logs / Metrics**
-* **Alarms and dashboards**
+Authorization happens on two levels this week. In the handler, after `aws-jwt-verify` validates the token, I load the local user row and resolve its `role` into one of three values: `learner`, `content_manager`, or `admin`. A small `requireRole()` wrapper rejects with 403 before any query runs, so an expired or downgraded account cannot reach the question bank even if its token is still valid.
 
-This integration is important because later networking labs become much easier when logs and health data are visible centrally.
+At the platform level, I stopped sharing a single execution role across functions. Each **AWS Lambda** now gets its own **IAM** role in the SAM template with only what it needs: VPC networking for the RDS-facing functions, `s3:GetObject` scoped to one prefix for the asset readers, and `ssm:GetParameter` limited to `/lingorise/dev/*`. Writing those policies made the data flow explicit, because any missing permission showed up immediately as an `AccessDenied` in **CloudWatch Logs**.
 
-#### 3. Build alarms for operational awareness
+#### 3. First data-processing services over the question bank
 
-I created **CloudWatch Alarms** around EC2 metrics so the system could notify or at least signal when resource usage becomes abnormal. Even in a lab setting, this introduced the idea that cloud infrastructure should be observable rather than manually checked.
+With identity and permissions in place, I wrote the first real handlers: list courses, read a course with its sections, list questions with pagination, and create or update a question. They all go through the `pg.Pool` singleton created outside the handler body, so a warm Lambda reuses its connection instead of opening a new one per invocation. That detail matters on `db.t4g.micro`, where the connection limit is small.
 
-#### 4. Use CloudTrail to trace administrative actions
+Write paths run inside a transaction and record who made the change using the local user id, which is the beginning of the audit log the content pipeline will need later. Question images stay in **Amazon S3**; the database only stores the object key, and the handler returns a key the frontend resolves separately.
 
-In parallel, I reviewed **CloudTrail** event history to see which AWS API calls had been made during setup and testing. This showed the difference between:
+#### 4. API Gateway resources, stage deployment, and CORS
 
-* **CloudWatch** for performance and operational monitoring
-* **CloudTrail** for audit and history of actions
+I defined the REST resources in the SAM template so **Amazon API Gateway** stays in source control: `/courses`, `/courses/{courseId}`, `/questions`, and `/me`. Each method maps to its Lambda through proxy integration, and the whole API deploys to a `dev` stage in `ap-southeast-1`.
 
-Together, these two services created a strong visibility layer around the infrastructure already deployed.
+CORS took the most time. The Amplify domain is a different origin from the API, so the browser sends a preflight `OPTIONS` before any request carrying an `Authorization` header. I configured the allowed origin explicitly instead of `*`, allowed `Authorization` and `Content-Type` headers, and made sure `OPTIONS` is not protected by the authorizer. Verifying it from the terminal was faster than guessing in the browser:
+
+```bash
+curl -i -X OPTIONS "$API_URL/questions" \
+  -H "Origin: https://dev.lingorise.app" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: authorization,content-type"
+```
 
 ### AWS Service Integration This Week:
 
-* **EC2 + CloudWatch Metrics:** Instance performance became measurable.
-* **EC2 + CloudWatch Agent + CloudWatch Logs:** OS-level data was centralized.
-* **CloudWatch + Alarms:** Monitoring data was used for proactive detection.
-* **AWS Account Activity + CloudTrail:** Administrative and API actions became traceable.
-* **Operations + Existing Infrastructure:** Observability was layered on top of previously deployed compute and network resources.
+* **Cognito + Lambda:** The ID token issued by the user pool is verified in the handler with `aws-jwt-verify` before any business logic runs.
+* **Cognito + RDS:** The Cognito `sub` links each identity to one row in the local `users` table that holds role and active state.
+* **Lambda + IAM:** Every function received a dedicated execution role scoped to the exact RDS, S3, and SSM resources it touches.
+* **API Gateway + Lambda:** REST resources and methods were mapped through proxy integration and released as the `dev` stage.
+* **API Gateway + Amplify Hosting:** CORS was configured for the Amplify origin so the Next.js app can call the API with an `Authorization` header.
+* **Lambda + S3 + RDS:** Question records live in PostgreSQL while their images stay in S3, joined by the stored object key.
 
 ### Week 6 Achievements:
 
-* Built a practical understanding of **CloudWatch** and **CloudTrail** in an operational context.
-* Improved visibility into instance health, performance, and activity history.
-* Learned how central logs and alarms support faster troubleshooting.
-* Connected infrastructure deployment with basic observability practices.
-* Established monitoring habits that would be valuable in later hybrid connectivity labs.
+* Working sign-up, confirmation, and sign-in flow against the `lingorise-dev` Cognito user pool.
+* A `users` table and idempotent provisioning helper that keeps Cognito identities and application roles in sync.
+* Role-based authorization enforced in the handlers for learner, content manager, and admin.
+* Per-function IAM execution roles replacing the earlier shared role.
+* First data-processing endpoints for courses and the question bank, running on a pooled RDS connection.
+* A deployed API Gateway `dev` stage that the frontend can call across origins.
 
 ### Challenges Faced:
 
-* It took time to decide which metrics were actually meaningful rather than simply available by default.
-* Distinguishing the roles of CloudWatch and CloudTrail required repeated comparison through hands-on use.
+* A 401 from the authorizer looks exactly like a CORS failure in the browser console, because the error response carries no CORS headers. I lost time on the wrong problem until I checked the raw response with `curl`.
+* Splitting one execution role into several broke two functions at deploy time; reading the `AccessDenied` entries in CloudWatch Logs was the only reliable way to find what each handler really needed.
+* Deciding what belongs in Cognito attributes and what belongs in the database required a second pass on the schema.
 
 ### Lessons Learned and Next Steps:
 
-* Good cloud operations rely on being able to observe, trace, and explain system behavior.
-* In the following week, I would apply this visibility mindset to the **Gateway VPC Endpoint** workshop for Amazon S3.
+* Identity and authorization are two different problems. Cognito answers who the caller is, the database and the code answer what that caller may do.
+* Least-privilege IAM is easier to write while the feature is fresh than to retrofit later, and it documents the data flow for free.
+* Next week I would go deeper on both sides: backend core services with entities, repositories, and business logic, and the frontend project structure with routing, state management, and UI.

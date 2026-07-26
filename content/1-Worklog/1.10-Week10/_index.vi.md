@@ -5,93 +5,87 @@ weight: 10
 chapter: false
 pre: " <b> 1.10. </b> "
 ---
+
 ### Mục tiêu tuần 10:
 
-* Tăng hiệu quả làm việc bằng cách tài liệu hóa command và tự động hóa các thao tác lặp lại.
-* Rà soát mức sử dụng tài nguyên và xây dựng ý thức kiểm soát chi phí khi làm lab.
-* Chuẩn bị đầy đủ tư liệu kỹ thuật cho báo cáo internship cuối kỳ.
+* Đóng gói toàn bộ source tree của LingoRise trên GitHub để một engineer khác có thể redeploy stack mà không cần hỏi tôi bất cứ điều gì.
+* Dọn dẹp các tài nguyên AWS còn sót lại từ những tuần trước và đặt hạn mức chi tiêu cho phần còn giữ lại.
+* Xác định đúng các thành phần tốn chi phí nhất của môi trường đang chạy bằng **AWS Cost Explorer** và hóa đơn theo từng service.
+* Hoàn thiện Final Internship Report bằng Tiếng Anh, bao gồm khảo sát dịch vụ AWS, thiết kế kiến trúc, triển khai, kết quả kiểm thử và bài học kinh nghiệm.
 
 ### Các công việc cần triển khai trong tuần này:
 
 | Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Tổng hợp và phân loại các AWS CLI commands đã sử dụng trong suốt workshop. | 22/06/2026 | 22/06/2026 | Ghi chú CLI cá nhân |
-| **2** | Tạo một helper script đơn giản hoặc checklist command để hỗ trợ kiểm tra môi trường hay cleanup. | 23/06/2026 | 23/06/2026 | AWS CLI Docs |
-| **3** | Xem lại AWS Billing, Budgets và Cost Explorer để hiểu resource usage trong môi trường lab. | 24/06/2026 | 24/06/2026 | [AWS Billing Docs](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/) |
-| **4** | Sắp xếp lại screenshots, diagrams và ghi chú từng bước để phần workshop có câu chuyện rõ ràng hơn. | 25/06/2026 | 25/06/2026 | Ghi chú chuẩn bị báo cáo |
-| **5** | Viết outline có cấu trúc cho các phần của report: objective, architecture, implementation, result và lessons learned. | 26/06/2026 | 26/06/2026 | Outline cá nhân |
-| **6** | Tự rà soát tài liệu để bổ sung những phần còn thiếu về screenshot, command output hoặc diễn giải kỹ thuật. | 27/06/2026 | 27/06/2026 | Self-review |
+| **1** | Dọn dẹp repository để bàn giao: README kèm deploy steps, `.env.example`, tài liệu migration và rà soát để chắc chắn không commit secret nào. | 22/06/2026 | 22/06/2026 | Repository dự án |
+| **2** | Viết runbook redeploy cho SAM stack `lingorise-dev` và tag một release trên GitHub. | 23/06/2026 | 23/06/2026 | [AWS SAM Docs](https://docs.aws.amazon.com/serverless-application-model/) |
+| **3** | Rà soát Cost Explorer và hóa đơn theo service, sau đó tắt hoặc xóa các tài nguyên lab không còn dùng từ những tuần trước. | 24/06/2026 | 24/06/2026 | [AWS Cost Explorer](https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html) |
+| **4** | Cấu hình AWS Budgets alerts cho account và xác nhận RDS cùng WAF là phần chi phí cố định lớn nhất. | 25/06/2026 | 25/06/2026 | [AWS Budgets Docs](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) |
+| **5** | Viết Final Internship Report bằng Tiếng Anh và chuẩn hóa nội dung site báo cáo Hugo cho khớp với báo cáo. | 26/06/2026 | 26/06/2026 | [FCJ Workshop Sample](https://workshop-sample.fcjuni.com/) |
 
 ### Cách thực hiện chi tiết:
 
-#### 1. Biến các bước thủ công lặp lại thành tài sản vận hành có thể tái sử dụng
+#### 1. Đóng gói repository để bàn giao
 
-Ở thời điểm này của internship, có rất nhiều thao tác AWS đã được lặp lại nhiều lần. Thay vì chỉ nhớ bằng trí nhớ, tôi tổng hợp các **AWS CLI commands** quan trọng thành ghi chú và helper script có thể tái sử dụng.
+Tôi coi repository chính là sản phẩm bàn giao, không chỉ là nơi chứa code. README giờ mô tả rõ cấu trúc của frontend Next.js, các handler **AWS Lambda** và template **AWS SAM**, kèm đúng chuỗi lệnh để build và deploy vào một account mới.
 
-Các lệnh này bao gồm:
+Tôi thêm `.env.example` liệt kê mọi biến mà ứng dụng cần, với giá trị thay bằng placeholder. Giá trị thật nằm trong **AWS Systems Manager Parameter Store** dưới dạng SecureString và được resolve lúc deploy qua `{{resolve:ssm:/lingorise/${Stage}/...}}`, nên không có gì nhạy cảm phải nằm trong repository. Sau đó tôi rà lại history theo các pattern quen thuộc và xác nhận chưa từng commit access key, database password hay webhook secret nào.
 
-* kiểm tra S3 bucket
-* xác minh EC2
-* kiểm tra IAM identity
-* test endpoint
-* chuẩn bị cleanup
+Phần migration cũng cần được ghi lại. Migration là các file SQL idempotent được theo dõi trong bảng `_migrations`, nên tôi ghi rõ quy tắc thứ tự và việc chạy lại toàn bộ trên một database **Amazon RDS for PostgreSQL** đang có dữ liệu là an toàn.
 
-Việc này kết nối phần thực thi kỹ thuật với tính nhất quán trong vận hành.
+#### 2. Viết runbook redeploy và tag release
 
-#### 2. Dùng CLI-based verification để hỗ trợ tính lặp lại của workshop
+Runbook đi từ một account trống đến môi trường chạy được: tạo các entry trong Parameter Store, build bundle Lambda bằng esbuild, deploy stack, rồi chạy migration lên database.
 
-Tôi tạo một verification flow nhỏ để sau mỗi lần đổi cấu hình có thể nhanh chóng kiểm tra:
+```bash
+sam build && sam deploy --stack-name lingorise-dev \
+  --parameter-overrides Stage=dev --capabilities CAPABILITY_IAM
+aws cloudformation describe-stacks --stack-name lingorise-dev \
+  --query "Stacks[0].Outputs" --region ap-southeast-1
+```
 
-* mình đang xác thực bằng tài khoản nào
-* EC2 hoặc endpoint mong muốn có tồn tại không
-* S3 access có đúng như kỳ vọng không
+Stack outputs trả về invoke URL của **Amazon API Gateway** và user pool ID của **Amazon Cognito**, đây đúng là hai giá trị mà bản build frontend trên **AWS Amplify Hosting** cần. Điều tôi muốn ghi lại chính là chuỗi phụ thuộc này: không thể cấu hình frontend trước khi CloudFormation hoàn tất, nên runbook phải sắp thứ tự theo đúng logic đó. Tôi tag commit thành một release để báo cáo tham chiếu tới một trạng thái code cố định.
 
-Điều này kết nối:
+#### 3. Dọn dẹp tài nguyên AWS và kiểm soát chi phí
 
-* **AWS CLI**
-* **IAM identity**
-* **EC2**
-* **S3**
-* **endpoint-based architecture**
+Tôi mở **AWS Cost Explorer** group theo service cho ba tháng gần nhất rồi rà từ trên xuống. Khá nhiều tài nguyên từ các tuần networking và compute vẫn còn sống: các instance **Amazon EC2** dư, các volume **Amazon EBS** không còn attach, những AMI cũ cùng snapshot phía sau, và một **NAT Gateway** vẫn tính tiền theo giờ rất lâu sau khi bài lab cần nó đã kết thúc. Tôi terminate các instance, xóa volume và snapshot, deregister các AMI cũ và xóa NAT Gateway.
 
-và giúp rút ngắn thời gian re-test.
+Phần còn lại cho thấy hình dạng thật của hóa đơn. **Amazon RDS** với `db.t4g.micro` và **AWS WAF** trên API Gateway stage là chi phí cố định lớn nhất, vì cả hai tính tiền theo thời gian và theo rule chứ không theo lưu lượng. Các thành phần serverless như Lambda, API Gateway, **Amazon S3** gần như không đáng kể ở mức traffic phát triển. Sự đối lập đó đáng đưa vào báo cáo: chọn serverless compute đã dồn gần như toàn bộ chi phí vào hai thành phần luôn bật.
 
-#### 3. Rà soát chi phí của các tài nguyên lab
+Sau đó tôi đặt **AWS Budgets** alerts ở các mốc 50, 80 và 100 phần trăm của mức chi tiêu tháng, gửi thông báo qua email để mọi tăng trưởng bất thường lộ ra sớm thay vì đến cuối kỳ billing mới biết.
 
-Tôi xem lại **AWS Budgets**, **Billing** và **Cost Explorer** để xác định những tài nguyên nào có thể tiếp tục phát sinh chi phí nếu để quên, đặc biệt là:
+#### 4. Hoàn thiện Final Internship Report bằng Tiếng Anh
 
-* NAT Gateway
-* Interface Endpoints
-* EC2 instances
-* storage resources
+Tôi viết báo cáo theo đúng thứ tự công việc đã diễn ra: khảo sát dịch vụ AWS, thiết kế kiến trúc, triển khai, kết quả kiểm thử, rồi bài học kinh nghiệm. Phần kiến trúc mô tả LingoRise như một đường đi của request chứ không phải một danh sách dịch vụ — client Next.js ưu tiên tiếng Việt trên Amplify Hosting gọi API Gateway, WAF lọc request, Lambda verify Cognito JWT bằng `aws-jwt-verify`, resolve entitlement từ `user_subscriptions`, rồi đọc ghi RDS qua `pg.Pool` singleton, còn S3 giữ ảnh câu hỏi và bài speaking submission.
 
-Qua đó tôi nhận ra rằng thiết kế cloud không chỉ cần đúng về mặt kỹ thuật mà còn phải có kỷ luật về chi phí.
-
-#### 4. Tổ chức evidence để phục vụ báo cáo
-
-Tôi gom diagrams, screenshots, policy snippets và CLI outputs theo từng chủ đề để có thể dùng trực tiếp cho báo cáo kỹ thuật. Việc này biến kết quả lab thành report-ready material và giúp giải thích mối quan hệ giữa các dịch vụ dễ hơn.
+Phần kết quả kiểm thử dùng lại bằng chứng từ tuần 9: hành vi resume session của exam engine, Cambridge band scoring cho IELTS và scaled bands cho TOEIC, cùng OCR job queue được worker theo lịch xử lý bằng `FOR UPDATE SKIP LOCKED`. Tôi cũng chuẩn hóa nội dung site Hugo để các trang worklog và bản báo cáo in kể cùng một câu chuyện với cùng thuật ngữ ở cả tiếng Anh và tiếng Việt.
 
 ### Kết nối các dịch vụ AWS trong tuần này:
 
-* **AWS CLI + IAM:** Xác minh identity giúp chạy lệnh an toàn và đúng ngữ cảnh.
-* **AWS CLI + S3/EC2/VPC Endpoints:** Trạng thái dịch vụ và hành vi truy cập được kiểm tra bằng lập trình.
-* **Billing + Deployed Resources:** Phân tích chi phí gắn trực tiếp với các quyết định triển khai hạ tầng.
-* **Documentation + Workshop Architecture:** Bằng chứng kỹ thuật được tổ chức xoay quanh các tích hợp dịch vụ thật chứ không phải screenshot rời rạc.
+* **AWS SAM + CloudFormation:** Stack `lingorise-dev` trở thành đơn vị deploy duy nhất, tái hiện được, và là trung tâm của runbook.
+* **CloudFormation Outputs + AWS Amplify Hosting:** URL API Gateway và Cognito pool ID đi từ stack outputs vào cấu hình build của frontend.
+* **Parameter Store + AWS SAM:** Secret nằm ngoài repository và được resolve lúc deploy, đó là điều khiến việc bàn giao công khai trở nên an toàn.
+* **Cost Explorer + Amazon RDS/AWS WAF:** Phân tích chi phí chỉ ra hai dịch vụ luôn bật là phần chi tiêu cố định lớn nhất của một thiết kế vốn serverless.
+* **AWS Budgets + Billing:** Các ngưỡng cảnh báo giờ theo dõi account để tài nguyên bỏ quên không âm thầm phát sinh chi phí.
+* **Amazon EC2 + Amazon EBS + NAT Gateway:** Xóa compute còn phải xóa cả storage đã attach, snapshot và đường mạng đi kèm mới thật sự dừng được hóa đơn.
 
 ### Kết quả đạt được tuần 10:
 
-* Xây dựng được bộ CLI reference và verification steps có thể tái sử dụng cho workshop.
-* Cải thiện tính lặp lại và giảm thời gian test nhờ documentation và một số bước automation đơn giản.
-* Tăng ý thức về chi phí đối với các tài nguyên cloud tạm thời.
-* Tổ chức lại tài liệu kỹ thuật thành cấu trúc phù hợp hơn cho báo cáo chính thức.
-* Chuẩn bị tốt hơn cho giai đoạn viết báo cáo và chia sẻ kết quả.
+* Bàn giao một repository đã đóng gói với deploy steps, `.env.example`, tài liệu migration và một release được tag.
+* Hoàn thành runbook redeploy đưa một account trống tới stack `lingorise-dev` chạy được.
+* Xóa các EC2 instance không dùng, EBS volume không attach, AMI và snapshot cũ, cùng NAT Gateway.
+* Xác nhận RDS và WAF là chi phí cố định lớn nhất và ghi lại lý do các thành phần serverless đóng góp rất ít.
+* Cấu hình AWS Budgets alerts ở ba mốc ngưỡng cho account.
+* Hoàn thiện Final Internship Report bằng Tiếng Anh và chuẩn hóa nội dung site Hugo cho khớp.
 
 ### Khó khăn gặp phải:
 
-* Công việc tài liệu hóa cần nhiều kỷ luật vì mỗi screenshot và command đều phải có ngữ cảnh đủ rõ.
-* Việc kiểm soát chi phí đòi hỏi hiểu tài nguyên nào có thể phát sinh charge kể cả khi tưởng như “để yên”.
+* Xóa tài nguyên an toàn cần cẩn thận, vì terminate một instance không xóa EBS volume của nó hay snapshot phía sau AMI, và những thứ đó vẫn âm thầm tính tiền.
+* Viết runbook làm lộ ra những bước tôi chỉ từng làm thủ công, nên phải tìm lại và ghi rõ vài giả định về thứ tự trước khi chuỗi lệnh chạy được từ đầu.
+* Nén mười tuần công việc vào một báo cáo tiếng Anh buộc tôi phải quyết định bỏ bớt gì mà không làm mất mạch kiến trúc.
 
 ### Bài học rút ra và định hướng tiếp theo:
 
-* Một cloud project tốt không chỉ chạy được mà còn phải tái hiện được, tài liệu hóa tốt và có ý thức tối ưu chi phí.
-* Sang tuần tiếp theo, tôi sẽ tập trung vào **knowledge sharing** và **report drafting**, dùng chính các tài liệu này để trình bày công việc rõ ràng hơn.
+* Một cloud project chỉ được coi là bàn giao khi người khác redeploy được chỉ từ repository; những gì còn nằm trong đầu tôi đều là dependency chưa được tài liệu hóa.
+* Kỷ luật chi phí là một vấn đề của kiến trúc. Chuyển sang serverless không tự động giảm chi phí khi một managed database và một WAF vẫn bật suốt ngày.
+* Sang tuần tiếp theo, tôi sẽ phân tích các chỉ số trải nghiệm người dùng và tỉ lệ lỗi từ những lượt dùng thử thật, rồi tinh chỉnh frontend **Next.js**/React và sửa các vấn đề phát sinh ngoài dự kiến dựa trên feedback.

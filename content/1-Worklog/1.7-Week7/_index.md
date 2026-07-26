@@ -5,94 +5,97 @@ weight: 7
 chapter: false
 pre: "<b>1.7. </b>"
 ---
+
 ### Week 7 Objectives:
 
-* Prepare the workshop environment for private access to Amazon S3.
-* Understand the architecture and use case of **Gateway VPC Endpoints**.
-* Practice configuring network routing for S3 access without using the public Internet.
+* Model the core LingoRise entities for courses, exams, questions, exam sessions, and answers in **Amazon RDS for PostgreSQL**.
+* Build a repository layer over the `pg.Pool` singleton so **AWS Lambda** handlers stop writing raw SQL inline.
+* Implement the exam engine business logic, including session creation and band scoring for IELTS and TOEIC.
+* Lay the frontend foundation on **Next.js (App Router)**: folder structure, routing, state management, and the Vietnamese-first UI.
 
 ### Tasks to be carried out this week:
 
 | Day | Task | Start Date | Completion Date | Reference Material |
 | :--- | :--- | :--- | :--- | :--- |
-| **1** | Read the workshop overview and redraw the target architecture for private S3 connectivity. | 01/06/2026 | 01/06/2026 | [Workshop Overview](https://workshop-sample.fcjuni.com/5-workshop/5.1-workshop-overview/) |
-| **2** | Review the lab environment including VPC, subnets, route tables, EC2 instances, and supporting resources. | 02/06/2026 | 02/06/2026 | Workshop notes |
-| **3** | Create a **Gateway VPC Endpoint** for Amazon S3 in the workshop VPC. | 03/06/2026 | 03/06/2026 | [Gateway Endpoint Lab](https://workshop-sample.fcjuni.com/5-workshop/5.3-lotushacks-utmorpho/5.3.1-from-zero-to-idea/) |
-| **4** | Verify route table updates and confirm that S3 traffic from the VPC uses the endpoint path. | 04/06/2026 | 04/06/2026 | [VPC Endpoints Docs](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html) |
-| **5** | Test basic bucket access from an EC2 instance and document the result with screenshots and CLI output. | 05/06/2026 | 05/06/2026 | [Test Gateway Endpoint](https://workshop-sample.fcjuni.com/5-workshop/5.3-lotushacks-utmorpho/5.3.2-building-under-pressure/) |
-| **6** | Summarize when Gateway Endpoints are appropriate and what limitations they have compared to Interface Endpoints. | 06/06/2026 | 06/06/2026 | Self-study notes |
+| **1** | Design and migrate the core schema in Amazon RDS for PostgreSQL: `courses`, `exams`, `exam_sections`, `questions`, and `question_options` with UUID primary keys and JSONB metadata. | 01/06/2026 | 01/06/2026 | [Amazon RDS for PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html) |
+| **2** | Add the session tables `exam_sessions` and `session_answers`, then build the repository layer over the `pg.Pool` singleton shared by all Lambda handlers. | 02/06/2026 | 02/06/2026 | Project repository |
+| **3** | Implement the exam engine service: `POST /exams/start` builds a session from a curated fixed test set or a random pull from the question bank. | 03/06/2026 | 03/06/2026 | [AWS Lambda Node.js](https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html) |
+| **4** | Resolve question asset URLs in the service layer, choosing between the public **Amazon S3** storage URL and a 15-minute presigned URL. | 04/06/2026 | 04/06/2026 | [S3 Presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html) |
+| **5** | Set up the Next.js App Router structure with learner and admin route groups, React Query for server state, and the first UI screens from the design. | 05/06/2026 | 05/06/2026 | [AWS Amplify Hosting](https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html) |
 
 ### Detailed Implementation:
 
-#### 1. Start from the workshop architecture instead of isolated resources
+#### 1. Model the core exam entities in Amazon RDS for PostgreSQL
 
-This week I moved from learning individual services to understanding a connected architecture. The goal was not simply “create an endpoint,” but to enable **private S3 access from a workload inside a VPC**.
+I started on the data model because every service this week depends on it. In **Amazon RDS for PostgreSQL** I added idempotent migration files for `courses`, `exams`, `exam_sections`, `questions`, and `question_options`, then the session side with `exam_sessions` and `session_answers`. Each migration is recorded in the `_migrations` table so re-running the runner on the `lingorise-dev` database is safe.
 
-I reviewed the full path involved:
+Two decisions shaped the rest of the week:
 
-* **EC2 instance inside VPC**
-* **Route table associated with subnet**
-* **Gateway VPC Endpoint**
-* **Amazon S3**
+* **UUID primary keys** so a session id can be handed to the browser without leaking row counts.
+* **JSONB metadata** columns on `questions` and `exam_sessions`, so IELTS Writing prompts and TOEIC Part 3 audio references can carry different shapes without a schema change per skill.
 
-This made it clear that endpoint configuration is really a networking integration task.
+```sql
+CREATE TABLE IF NOT EXISTS exam_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  exam_id UUID NOT NULL REFERENCES exams(id),
+  status TEXT NOT NULL DEFAULT 'in_progress',
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
 
-#### 2. Create the Gateway VPC Endpoint for S3
+#### 2. Build the repository layer over the pg.Pool singleton
 
-I opened the VPC console and created a **Gateway Endpoint** for Amazon S3. During this process, I selected:
+Last week the first APIs behind **Amazon API Gateway** queried the database directly inside each handler. That does not scale, so I introduced a repository layer: `courseRepository`, `examRepository`, `questionRepository`, and `sessionRepository`. Every repository takes the same `pg.Pool` singleton that is created outside the **AWS Lambda** handler and reused across warm invocations.
 
-* the correct **VPC**
-* the correct **route table**
-* the default endpoint policy for initial testing
+The repositories are the only place that knows SQL. Handlers now read like request plumbing: parse the event, verify the Cognito JWT claims, call a service, shape the response. Because esbuild bundles each function separately, keeping the pool in one shared module also kept the connection count against the `db.t4g.micro` instance predictable.
 
-This step updated the route logic so S3 requests from the selected subnets could travel through the endpoint rather than the public Internet path.
+#### 3. Implement the exam engine business logic
 
-#### 3. Test S3 access from EC2 inside the VPC
+The service layer is where the actual product lives. `POST /exams/start` resolves the caller from the verified token, checks for an existing in-progress session to resume, and otherwise builds a new one. An exam either has a curated fixed test set, in which case the questions come in a defined order, or it is generated by a random pull from the question bank filtered by skill, level, and section.
 
-From an EC2 instance in the VPC, I ran test commands using AWS CLI to access an S3 bucket. The purpose was to verify both:
+Once the question list exists, the service resolves each asset reference. Public illustrations get the plain **Amazon S3** storage URL; anything restricted, such as listening audio, gets a presigned URL valid for 15 minutes, which is long enough for a section but short enough that a copied link is worthless later.
 
-* network path behavior
-* IAM permission behavior
+Scoring lives in the same layer: raw correct counts map to **Cambridge bands** for IELTS and to scaled bands for TOEIC, so the frontend never computes a score itself.
 
-This showed the first strong connection between weeks:
+#### 4. Lay the Next.js App Router foundation
 
-* **Week 2:** VPC and route tables
-* **Week 5:** IAM roles and permissions
-* **Week 7:** S3 private access through a Gateway Endpoint
+On the frontend I set up the **Next.js** App Router structure that **AWS Amplify Hosting** will build. I split the tree into route groups: `(learner)` for the dashboard, course pages, and the exam runner, and `(admin)` for the content pipeline screens that come later.
 
-#### 4. Observe how networking and permissions must both be correct
+State management is deliberately split in two:
 
-The test would only succeed when multiple layers were aligned:
+* **React Query** owns server state, so course lists and exam metadata are cached and revalidated instead of refetched on every render.
+* **Local React state** owns the exam timer and the answer sheet, because they change every second and must not trigger network traffic.
 
-* EC2 must have valid IAM access
-* the subnet must be associated with the correct route table
-* the Gateway Endpoint must be attached properly
-* S3 target access must be allowed
-
-This was an important lesson because AWS integrations are often multi-layered rather than isolated to one service.
+I then built the first Vietnamese-first UI components from the design: the course card, the section navigator, and the answer sheet grid. Labels are Vietnamese while technical identifiers stay in English, which keeps the copy natural for learners without renaming API fields.
 
 ### AWS Service Integration This Week:
 
-* **EC2 + IAM Role:** The instance authenticated to AWS services using temporary credentials.
-* **EC2 + VPC/Subnet/Route Table:** Network routing defined how traffic left the instance.
-* **Route Table + Gateway VPC Endpoint:** S3 traffic was redirected through a private AWS-managed path.
-* **Gateway Endpoint + S3:** Object storage became reachable without public Internet routing.
-* **Workshop Architecture + Earlier Weeks:** Networking, identity, and storage all came together in one lab.
+* **Lambda + RDS for PostgreSQL:** The `pg.Pool` singleton lives outside the handler so warm invocations reuse database connections instead of opening new ones.
+* **Lambda + Amazon S3:** The exam service issues 15-minute presigned URLs for restricted question assets at session start.
+* **API Gateway + Lambda:** The new exam engine routes are exposed through the REST API created last week, with handlers reduced to thin adapters over the service layer.
+* **Amazon Cognito + Lambda:** Verified JWT claims identify the learner whose session and answers are being written.
+* **Amplify Hosting + API Gateway:** The Next.js app is structured so every server-state query points at one API base URL resolved from the Amplify environment.
+* **CloudWatch Logs + Lambda:** Session creation and scoring log a structured line per request, which made tracing a wrong band value straightforward.
 
 ### Week 7 Achievements:
 
-* Understood the use case and benefits of **Gateway VPC Endpoints** for Amazon S3.
-* Successfully configured private S3 access from workloads inside the VPC.
-* Connected networking knowledge with storage and IAM behavior in a practical architecture.
-* Built stronger confidence in reading workshop diagrams and translating them into AWS configurations.
-* Prepared the groundwork for the more advanced hybrid access scenario in the next week.
+* Migrated the full core schema for courses, exams, questions, sessions, and answers into the `lingorise-dev` PostgreSQL database.
+* Replaced inline SQL in handlers with a repository layer sharing a single `pg.Pool`.
+* Implemented `POST /exams/start` with resume support, fixed and random question selection, and asset URL resolution.
+* Implemented Cambridge band scoring for IELTS and scaled band scoring for TOEIC in one place.
+* Established the Next.js App Router layout, route groups, and React Query setup for the frontend.
+* Built the first Vietnamese-first UI components directly from the design.
 
 ### Challenges Faced:
 
-* Selecting the correct route table for the lab required careful verification.
-* It was not enough to create the endpoint; I had to confirm that the traffic path actually changed as expected.
+* Random question selection first returned duplicates across sections; I had to move the exclusion logic into the SQL query instead of filtering in JavaScript.
+* Deciding which assets deserve presigned URLs took some care, because signing everything would have made page loads slower for no security gain.
+* Keeping the exam timer in local state while React Query refetched in the background caused an early re-render bug that reset the countdown.
 
 ### Lessons Learned and Next Steps:
 
-* Private connectivity in AWS is usually the result of correct integration between network design and access control.
-* In the next week, I would extend this model to **Interface Endpoints**, **DNS**, and **on-premises simulation** for hybrid architecture practice.
+* A repository and service split is worth the extra files: once business logic left the handlers, testing a scoring rule no longer required an API call.
+* Storing per-skill differences in JSONB kept the schema stable while IELTS and TOEIC requirements were still moving.
+* Next week I will connect the two halves: wiring the Next.js frontend to the backend REST API and implementing authentication and authorization end to end with **JWT** and **Amazon Cognito**.
